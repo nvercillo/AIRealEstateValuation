@@ -4,17 +4,17 @@ module.exports = {
 }
 
 // geo location retrieval
-async function get_coords_from_address (ADDRESS){
+async function get_coords_from_address(ADDRESS) {
     const puppeteer = require('puppeteer');
     return await (async () => {
         try {
             const browser = await puppeteer.launch({
-                executablePath: 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe',
+                executablePath: '/usr/bin/google-chrome-stable',
                 headless: true,
                 userAgent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/85.0.4183.83 Safari/537.36",
-                args: ['--no-sandbox', '--disable-setuid-sandbox', '--window-size=1920,1080'] 
+                args: ['--no-sandbox', '--disable-setuid-sandbox', '--window-size=1920,1080']
             });
-            
+
             // create new page
             const page = await browser.newPage();
 
@@ -24,16 +24,16 @@ async function get_coords_from_address (ADDRESS){
             await context.overridePermissions("https://www.gps-coordinates.net/", ['geolocation'])
 
             //set location
-            await page.setGeolocation({latitude:43.664305 , longitude:-79.52661})
-            
+            await page.setGeolocation({ latitude: 43.664305, longitude: -79.52661 })
+
             //open url
-            await page.goto("https://www.gps-coordinates.net/", {waitUntil: 'networkidle2'});
+            await page.goto("https://www.gps-coordinates.net/", { waitUntil: 'networkidle2' });
 
             // scroll to bottom of the page to enable page to work
             await page.evaluate(async () => {
                 await new Promise((resolve, reject) => {
                     var totalHeight = 0;
-                    
+
                     // scroll down by 100 pixes
                     var distance = 100;
                     var timer = setInterval(() => {
@@ -41,19 +41,19 @@ async function get_coords_from_address (ADDRESS){
                         window.scrollBy(0, distance);
                         totalHeight += distance;
 
-                        if(totalHeight >= scrollHeight){
+                        if (totalHeight >= scrollHeight) {
                             clearInterval(timer);
                             // resolve promise
-                            resolve(); 
+                            resolve();
                         }
-                    // 100 ms delay each scrolls
-                    }, 100);    
+                        // 100 ms delay each scrolls
+                    }, 100);
                 });
-                
+
                 // scroll back up
-                await new Promise((resolve, ) => {
+                await new Promise((resolve,) => {
                     var totalHeight = 0;
-                    
+
                     // scroll down by 100 pixes
                     var distance = 100;
                     var timer = setInterval(() => {
@@ -61,25 +61,25 @@ async function get_coords_from_address (ADDRESS){
                         window.scrollBy(0, distance);
                         totalHeight -= distance;
 
-                        if(totalHeight <= scrollHeight){
+                        if (totalHeight <= scrollHeight) {
                             clearInterval(timer);
                             // resolve promise
-                            resolve(); 
+                            resolve();
                         }
-                    // 100 ms delay each scrolls
-                    }, 100);    
+                        // 100 ms delay each scrolls
+                    }, 100);
                 });
             });
 
 
-            await page.evaluate( () => document.getElementById("address").value = "");
-            
+            await page.evaluate(() => document.getElementById("address").value = "");
+
             // insert address into input tag
-            await page.type('input[id="address"]', ADDRESS.concat(", Toronto, ON, Canada"), {delay: 200})
+            await page.type('input[id="address"]', ADDRESS.concat(", Toronto, ON, Canada"), { delay: 200 })
 
 
             await page.evaluate(() => {
-                var  query = document.querySelectorAll('button[class="btn btn-primary"]');
+                var query = document.querySelectorAll('button[class="btn btn-primary"]');
                 query[0].click();
             })
 
@@ -99,31 +99,47 @@ async function get_coords_from_address (ADDRESS){
             })
 
             // the number of columns passed
-            let numC =0;  
+            let numC = 0;
 
             let lat = ""
             let lon = ""
-            for (let i =0; i< string.length; i++){
-                if (string[i] == ':'){
+            for (let i = 0; i < string.length; i++) {
+                if (string[i] == ':') {
                     numC++;
-                } else if (string[i] == " "){
+                } else if (string[i] == " ") {
                     numC++;
-                } else if (string[i] == '\n' ){
+                } else if (string[i] == '\n') {
                     break;
                 }
-                if (numC ==2){
+                if (numC == 2) {
                     lat += string[i];
-                } else if (numC ==6){
+                } else if (numC == 6) {
                     lon += string[i];
                 }
             }
 
-            let obj = {'lon': parseFloat(lon), 'lat' : parseFloat(lat)}
+            let obj = { 'lon': parseFloat(lon), 'lat': parseFloat(lat) }
 
             await browser.close();
             return obj
-        } catch (err){
-            return {'error' : err}
+        } catch (err) {
+            return { 'error': err }
         }
     })();
-} 
+}
+
+
+async function run_program(list) {
+    for (var i = 0; i < list.length; i++) {
+        let c = await get_coords_from_address(list[i])
+        console.log(c)
+    }
+
+}
+
+
+run_program(['270 Wilson Avenue', '270 Wilson Ave', '3401 Dufferin Street', '429 Wilson Avenue', '322 Wilson Avenue', '1838 Avenue Road', '424 Wilson Avenue', '362 Wilson Avenue', '336 Wilson Avenue', '274 Wilson Ave', '693 Wilson Avenue', '693 Wilson Avenue', '418 Wilson', '418 Wilson Avenue', '418 Wilson Avenue', '3750 Bathurst', '901 Sheppard Avenue West', '908 Sheppard Ave W', '10 Palm Drive', '4169 Bathurst Street', '141 Wilson Avenue', '2140 Rd Ave', '2140 Rd Ave', '2140 Avenue Road', '4256 Bathurst Street', '4256 Bathur St', '4256 Bathur St', '3910 Bathur St', '4256 Bathurst Street', '4256 Bathurst Street', '1 Yorkdale Road', '3401 Dufferin Street', '3401 Dufferin St', '3401 Dufferin Street', '3401 Dufferin Street', '3401 Dufferin St', '3827 Bathurst Street', '3426 Bathurst Street', '3401 Dufferin Street'])
+
+// var res = await run_program(['270 Wilson Avenue'])
+
+// console.log(res)
