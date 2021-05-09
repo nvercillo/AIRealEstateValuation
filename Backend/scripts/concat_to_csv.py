@@ -2,26 +2,6 @@ import json
 import csv
 
 
-
-# class DynamoModel:
-
-#     def __init__(self):
-#         db = boto3.resource('dynamodb')
-#         self.table = db.Table('AIPropertyData')
-
-#     def insert_item(self, item):
-
-
-#         self.table.put_item(
-#             Item ={'address': item['address'],
-#                 'longitude' : item['longitude'],
-#                 'latitude' : item['latitude'],
-#                 "data" : item
-#             })  
-
-
-# db = DynamoModel()
-
 lines = "" 
 
 rows = []
@@ -29,7 +9,7 @@ col_names = []
 first = True
 for i in range(1, 450):
     try:
-        with open(f"data{i}.txt", "r", encoding="utf8") as f:
+        with open(f"../../Data/data{i}.txt", "r", encoding="utf8") as f:
             flines = f.readlines()
             for line in flines:
                 lines += line
@@ -39,7 +19,7 @@ for i in range(1, 450):
                 col_names = [k for k in data] 
         
         if len(rows) > 150:
-            with open('data.csv', 'a+', newline='') as csv_f:
+            with open('../../Data/data.csv', 'a+', newline='') as csv_f:
                 writer = csv.writer(csv_f)
                 if first:
                     writer.writerows([col_names])
@@ -51,7 +31,7 @@ for i in range(1, 450):
         print(f"page {i} failed")
 
 
-with open('data.csv', 'a+', newline='') as csv_f:
+with open('../../Data/data.csv', 'a+', newline='') as csv_f:
     writer = csv.writer(csv_f)
     if first:
         writer.writerows(col_names)
@@ -60,6 +40,3 @@ with open('data.csv', 'a+', newline='') as csv_f:
     writer.writerows(rows)
     rows = [] 
     
-    
-
-

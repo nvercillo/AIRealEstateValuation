@@ -26,4 +26,45 @@ All of these unique exponetial funcitons are calculated using a secondary model.
 
 
 
+## Web Scrapper
+
+
+
+## Backend 
+
+### Setup 
+Requirements: python3 as python, pip3 as pip, virtuenv-python, Postgres
+
+* On Linux: 
+
+cd backend 
+python -m venv env (optional)
+source env/bin/activate (optional)
+pip install -r requirements.txt
+
+
+sudo -u postgres -i
+
+psql
+
+create database NODE_DATA;
+
+python manage.py db init
+
+python manage.py db migrate
+
+python manage.py db upgrade
+
+ONE TIME ONLY: 
+python create_api_key.py (optional, creates api key and adds it to env file. This should be copied in frontend)
+
+python server.py 
+
+
+
+### Testing 
+Requirements: pytest 
+cd backend;
+pytest (outside of venv)
+
 
