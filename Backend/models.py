@@ -14,10 +14,10 @@ from sqlalchemy.dialects.postgresql import UUID
 
 
 # if __name__ =="__main__":
-# from app import db
+from server import db
 #     print("SDFSDFS")
 # else:
-db = SQLAlchemy()
+# db = SQLAlchemy()
     
 
 class Property(db.Model):
@@ -63,8 +63,11 @@ class Property(db.Model):
             session.add(obj)
             session.commit()
 
-    def __repr__(self):
-        return f'<address {self.address}, id {self.id}>'
+    # def __repr__(self):
+    #     return f'<address {self.address}, id {self.id}>'
+
+    # def __str__(self):
+    #     return f'<address {self.address}, id {self.id}>'
 
 
 

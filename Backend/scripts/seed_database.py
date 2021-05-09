@@ -1,5 +1,6 @@
 import sys
 sys.path.insert(0,'..') # import parent folder 
+import time 
 import os
 import requests
 import json
@@ -15,7 +16,7 @@ import threading
 
 google_api_base_url = "https://maps.googleapis.com/maps/api/geocode/json?"
 
-
+  
 
 class SeedDatabase:
     def get_google_maps(self, url):
@@ -25,18 +26,41 @@ class SeedDatabase:
         coords = data.get("results")[0].get("geometry").get("location")
         
         return coords
+    
+    
+    def seed_entire_db(self):
+        log_mutex = threading.Lock()
         
-
-
-    def seed_db_and_geoencode_amenities(self):
-
-        with open('../../Data/data.csv') as f:
+        thread_pool = []
+        for i in range(1 , 12 +1):
+            thread = threading.Thread(
+                target=self.seed_db_and_geoencode_amenities_for_csv_file,
+                args=(i, log_mutex)
+            )
         
+            thread_pool.append(thread)
+            thread.start()
+            print(f"starting thread {i}")
+            # break
+
+        c =1
+        for t in thread_pool:
+ 
+            print(f'joining thread {c}')
+            t.join()
+            c +=1 
+            # break
+
+    def seed_db_and_geoencode_amenities_for_csv_file(self, csv_ind, log_mutex):
+
+        with open(f'../../Data/data_{csv_ind}.csv') as f:
+
             count =0 
             to_insert = []
             db_insert_thread_pool = [] 
             for row in csv.DictReader(f, skipinitialspace=True):
-                # print(row)
+
+                # geoencoding 
                 to_update = []
                 for k in row:
                     if " address" in k:
@@ -51,7 +75,7 @@ class SeedDatabase:
 
                         url = f"{google_api_base_url}{urllib.parse.urlencode(parameters)}"
                         
-                        limit_of_retries = 5
+                        limit_of_retries = 10
                         while limit_of_retries > 0:
                             try:
                                 coords = self.get_google_maps(url)
@@ -65,7 +89,9 @@ class SeedDatabase:
                                 pass
                             
                             limit_of_retries -= 1
-                        assert limit_of_retries >0, f"Google api failed on {url} passed the acceptable number of times"
+
+                            time.sleep(3)
+                        # assert limit_of_retries >0, f"Google api failed on {url} passed the acceptable number of times"
                         
                         # to_update.append(row[k].strip())
                     
@@ -88,29 +114,40 @@ class SeedDatabase:
 
                 to_insert.append(prop)
 
-                if count ==10:
+                if count ==1:
                     print("\n\n\nINSERTING ANOTHER 100 OBJECTS \n\n\n")
                     
-                    thread = threading.Thread(target=prop._insert, args=(to_insert,))
-                    db_insert_thread_pool.append(thread)
+                    log_mutex.acquire()
+                    
+                    try: 
+                        thread = threading.Thread(target=prop._insert, args=(to_insert.copy(),))
+                        db_insert_thread_pool.append(thread)
 
-                    thread.start()
-                    prop._insert(to_insert)
+                        thread.start()
+                        f = open("seeding_log.txt", "a+")
+                        f.write(f"THREAD {csv_ind} writing property {prop}")
+                        f.close()
+                    except:
+                        f = open("seeding_log.txt", "a+")
+                        f.write(f"THREAD {csv_ind} FFFFFAILED nearby {prop}")
+                        f.close()
+
+                    finally:
+                        log_mutex.release()    
                     
-                    
-                    count = -1
-                    to_insert.clear()
+                        count = -1
+                        to_insert.clear()
     
                 count +=1
-                for t in db_insert_thread_pool:
-                    if not t.is_alive():
-                        # get results from thread
-                        t.handled = True
+                # for t in db_insert_thread_pool:
+                #     if not t.is_alive():
+                #         # get results from thread
+                #         t.handled = True
                     
-                db_insert_thread_pool =  [t for t in db_insert_thread_pool if not t.handled]
+                # db_insert_thread_pool =  [t for t in db_insert_thread_pool if not t.handled]
 
 
             for t in db_insert_thread_pool:
                 t.join()
 
-SeedDatabase().seed_db_and_geoencode_amenities()
+SeedDatabase().seed_entire_db()

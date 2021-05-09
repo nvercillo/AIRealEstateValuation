@@ -1,4 +1,4 @@
-filepath = 'data.txt'
+filepath = 'enums_to_create_example.txt'
 
 arr = [] 
 with open(filepath) as fp:

@@ -2,7 +2,7 @@ import os
 from flask_script import Manager
 from flask_migrate import Migrate, MigrateCommand
 
-from app import app, db
+from server import app, db
 
 app.config['DB_URI'] = os.environ['DB_URI']
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = os.environ['SQLALCHEMY_TRACK_MODIFICATIONS']

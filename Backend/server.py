@@ -58,7 +58,7 @@ CORS(app, support_credentials=True)
 db = SQLAlchemy(app)
 
 ''' END SERVER INITIALIZATION AND CONFIG '''
-
+# from models import Property 
 
 
 ''' ROUTES '''
