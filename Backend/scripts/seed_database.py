@@ -30,6 +30,8 @@ class SeedDatabase:
     
     def seed_entire_db(self):
         log_mutex = threading.Lock()
+
+        ''' REQUIREMENT: have  DATA.CSV split into 12 files ''' 
         
         thread_pool = []
         for i in range(1 , 12 +1):
