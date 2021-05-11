@@ -54,7 +54,6 @@ def require_appkey(view_function):
         if request.args.get('key') and request.args.get('key') == os.environ['API_KEY']:
             return view_function(*args, **kwargs)
         else:
-            return view_function(*args, **kwargs)
             abort(401)
     return decorated_function
 
@@ -76,7 +75,7 @@ def welcome_text():
 
 @app.route("/api/adjacent_nodes", methods=["POST"])
 @cross_origin(supports_credentials=True)
-# @require_appkey
+@require_appkey
 def get_adjacent_nodes():
     req = json.loads(request.data)
     
@@ -84,6 +83,25 @@ def get_adjacent_nodes():
         req['longitude'],
         req['latitude'])
     
+    response = app.response_class(
+        response=json.dumps(data),
+        status=200,
+        mimetype='application/json'
+    )
+
+    return response
+
+@app.route("/api/amenities", methods=["GET"])
+@cross_origin(supports_credentials=True)
+# @require_appkey
+def get_amenities_from_id():
+    
+    requested_id = request.args.get("id")
+    
+    prop = PropertiesController()._get_by_id(
+        requested_id
+    )
+
     response = app.response_class(
         response=json.dumps(data),
         status=200,

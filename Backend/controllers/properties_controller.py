@@ -13,6 +13,9 @@ class PropertiesController:
     def __init__(self):
         pass
 
+    def _get_by_id(self, id):
+        return Property._query_by_id(id).__as_dict__()
+
     def _get_closest_nodes(self, node, nodes):
         arr = distance.cdist([node], nodes)
 
@@ -34,7 +37,7 @@ class PropertiesController:
 
 
     def _get_adjacent_nodes(self, lgn, lat):
-        res = Property._query(lgn, lat) 
+        res = Property._query_by_coords(lgn, lat) 
     
         _map = {}
         coords =  []

@@ -55,12 +55,20 @@ class Property(db.Model):
 
 
     @staticmethod   
-    def _query(lgn, lat):
+    def _query_by_coords(lgn, lat):
 
         engine = create_engine(os.environ["DB_URI"], echo=True)
         Session = sessionmaker(bind=engine)
         session = Session()
         res = session.query(Property).all()
+        return res
+
+    @staticmethod   
+    def _query_by_id(id):
+        engine = create_engine(os.environ["DB_URI"], echo=True)
+        Session = sessionmaker(bind=engine)
+        session = Session()
+        res = session.query(Property).get(id)
         return res
     
     @staticmethod
