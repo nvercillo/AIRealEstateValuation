@@ -38,6 +38,16 @@ def test_get_adjacent_nodes():
     print("Get adjacent nodes test passed")
 
 
+def test_get_amenities_from_id():
+    res = requests.get(
+        url=f"http://localhost:5000/api/amenities?key={os.environ['API_KEY']}", 
+        params={"id" : "00159f42-8e6d-4c85-ad17-28942a8dd700"}
+    )
+    print(res.text)
+    assert res.status_code == 200
+    print("Get adjacent nodes test passed")
+
+
 def test_enumerations_get():
 
     res = requests.get(
