@@ -54,7 +54,6 @@ def require_appkey(view_function):
         if request.args.get('key') and request.args.get('key') == os.environ['API_KEY']:
             return view_function(*args, **kwargs)
         else:
-            return view_function(*args, **kwargs)
             abort(401)
     return decorated_function
 
@@ -102,7 +101,7 @@ def get_amenities_from_id():
     prop = PropertiesController()._get_by_id(
         requested_id
     )
-    
+
     response = app.response_class(
         response=json.dumps(data),
         status=200,
