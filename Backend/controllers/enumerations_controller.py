@@ -12,4 +12,3 @@ class EnumerationsController:
             data[e.name] = e.value
 
         return data
-    

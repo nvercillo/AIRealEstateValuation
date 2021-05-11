@@ -25,7 +25,7 @@ class Enumerations(Enum):
         three = 3
         four = 4
 
-    class _Parking_Total(Enum):
+    class _ParkingTotal(Enum):
         zero = 0
         one = 1
         two =2
@@ -56,6 +56,7 @@ class Enumerations(Enum):
         six = 6 
         seven = 7
         eight = 8
+        nine = 9
     
 
     Sqaurefootage =  ["0-499","500-599","600-699","700-799","800-899","900-999","1000-1199","1200-1399","1400-1599","1600-1799","1800-1999","2000-2249","2250-2499","2500-2749","2750-2999","3000-3249","3250-3499","3500-3749","3750-3999","4000-4499","4500-4999", "5000+"]
@@ -70,8 +71,9 @@ class Enumerations(Enum):
    
     Dens = [ t.value for t in  _Dens ]
    
-    Parking_Total = [ t.value for t in  _Parking_Total ]
+    ParkingTotal = [ t.value for t in  _ParkingTotal ]
+    
+    Bedrooms = [ t.value for t in  _Bedrooms ]
    
     Bathrooms = [ t.value for t in  _Bathrooms ]
    
-    Bedrooms = [ t.value for t in  _Bedrooms ]

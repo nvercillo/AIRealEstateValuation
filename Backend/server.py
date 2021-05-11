@@ -93,7 +93,7 @@ def get_adjacent_nodes():
 
 @app.route("/api/amenities", methods=["GET"])
 @cross_origin(supports_credentials=True)
-# @require_appkey
+@require_appkey
 def get_amenities_from_id():
     
     requested_id = request.args.get("id")
