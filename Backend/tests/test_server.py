@@ -1,3 +1,4 @@
+import json 
 import requests
 import os
 from dotenv import load_dotenv
@@ -28,15 +29,16 @@ def test_unauthenticated_request():
 
 
 def test_get_adjacent_nodes():
-    res = requests.get(
+    res = requests.post(
         url=f"http://localhost:5000/api/adjacent_nodes?key={os.environ['API_KEY']}", 
+        data=json.dumps({"longitude" :  -79.205745, "latitude" : 43.810167 })
     )
     print(res.text)
     assert res.status_code == 200
     print("Get adjacent nodes test passed")
 
 
-def test_authenticated_req_enumerations_get():
+def test_enumerations_get():
 
     res = requests.get(
         url=f"http://localhost:5000/api/enumerations?key={os.environ['API_KEY']}", 

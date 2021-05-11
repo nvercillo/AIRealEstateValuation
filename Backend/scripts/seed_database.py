@@ -122,7 +122,7 @@ class SeedDatabase:
                     log_mutex.acquire()
                     
                     try: 
-                        thread = threading.Thread(target=prop._insert, args=(to_insert.copy(),))
+                        thread = threading.Thread(target=Property._insert, args=(to_insert.copy(),))
                         db_insert_thread_pool.append(thread)
 
                         thread.start()
