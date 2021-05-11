@@ -8,16 +8,16 @@ from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.dialects.postgresql import JSON
 from sqlalchemy import Column, Integer, String, ForeignKey, create_engine
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import relationship, backref, sessionmaker, joinedload
+from sqlalchemy.orm import relationship, backref, sessionmaker, joinedload, load_only
 from sqlalchemy.dialects.postgresql import UUID
 
 
 
 # if __name__ =="__main__":
-from server import db
+# from server import db
 #     print("SDFSDFS")
 # else:
-# db = SQLAlchemy()
+db = SQLAlchemy()
     
 
 class Property(db.Model):
@@ -54,20 +54,38 @@ class Property(db.Model):
             and not callable(key) and '_sa_instance' not in key}
 
 
-    def _insert(self, bulk_list=None):
+    @staticmethod   
+    def _query(lgn, lat):
+
+        engine = create_engine(os.environ["DB_URI"], echo=True)
+        Session = sessionmaker(bind=engine)
+        session = Session()
+        res = session.query(Property).all()
+        return res
+    
+    @staticmethod
+    def _insert(bulk_list):
 
         engine = create_engine(os.environ["DB_URI"], echo=True)
         Session = sessionmaker(bind=engine)
         session = Session()
         for obj in bulk_list:
             session.add(obj)
-            session.commit()
+        session.commit()
 
-    # def __repr__(self):
-    #     return f'<address {self.address}, id {self.id}>'
 
-    # def __str__(self):
-    #     return f'<address {self.address}, id {self.id}>'
+    def __as_small_dict__(self):
+        return {
+            "address" : str(self.address),
+            "id" : str(self.id),
+            "lgn": float(self.longitude),
+            "lat" : float(self.latitude)
+        }
+    def __repr__(self):
+        return f'<address {self.address}, id {self.id}>'
+
+    def __str__(self):
+        return f'<address {self.address}, id {self.id}, lgn {self.longitude}, lat {self. latitude}>'
 
 
 

@@ -21,10 +21,15 @@ from dotenv import load_dotenv
 from os.path import join, dirname
 load_dotenv(join(dirname(__file__), '.env'))
 
+''' Models '''
+# from models import Property  # uncomment when running migration 
+
 
 ''' Controllers ''' 
 from controllers import enumerations_controller
 EnumerationsController = enumerations_controller.EnumerationsController
+from controllers import properties_controller
+PropertiesController = properties_controller.PropertiesController
 
 
 
@@ -49,6 +54,7 @@ def require_appkey(view_function):
         if request.args.get('key') and request.args.get('key') == os.environ['API_KEY']:
             return view_function(*args, **kwargs)
         else:
+            return view_function(*args, **kwargs)
             abort(401)
     return decorated_function
 
@@ -58,7 +64,6 @@ CORS(app, support_credentials=True)
 db = SQLAlchemy(app)
 
 ''' END SERVER INITIALIZATION AND CONFIG '''
-# from models import Property 
 
 
 ''' ROUTES '''
@@ -69,15 +74,23 @@ def welcome_text():
     return "This is an authenticated server :)"
 
 
-@app.route("/api/adjacent_nodes", methods=["GET"])
+@app.route("/api/adjacent_nodes", methods=["POST"])
 @cross_origin(supports_credentials=True)
 # @require_appkey
 def get_adjacent_nodes():
+    req = json.loads(request.data)
+    
+    data = PropertiesController()._get_adjacent_nodes(
+        req['longitude'],
+        req['latitude'])
+    
+    response = app.response_class(
+        response=json.dumps(data),
+        status=200,
+        mimetype='application/json'
+    )
 
-    # res = Property.query.all()
-    # print(res)
-
-    return "DSFSDfsdfd"
+    return response
 
 @app.route("/api/enumerations", methods=["GET"])
 @cross_origin(supports_credentials=True)
