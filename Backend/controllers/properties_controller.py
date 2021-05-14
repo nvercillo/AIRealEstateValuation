@@ -5,9 +5,6 @@ from numpy import random
 from scipy.spatial import distance
 
 
-
-
-
 class PropertiesController:
     
     def __init__(self):
