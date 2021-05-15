@@ -3,6 +3,32 @@ import os
 from flask import Flask
 from sqlalchemy.ext.declarative import DeclarativeMeta
 
+def mode(_list):
+    _list.sort()
+
+    mode = None
+    count = 0 
+
+    l_mode = None
+    l_count = 0 
+
+    for l in _list:
+        if l != l_mode:
+            if l_mode is not None and l_count > count: 
+                count = l_count
+                mode = l_mode
+
+            l_mode = l
+            l_count = 1 
+        else: 
+            l_count +=1 
+    if l_mode is not None and l_count > count: 
+        count = l_count
+        mode = l_mode
+
+    return mode
+
+
 class Utils:
     @staticmethod
     def get_app_with_db_configured():

@@ -53,9 +53,7 @@ db = SQLAlchemy(app)
 ''' END SERVER INITIALIZATION AND CONFIG '''
 
 ''' Models DO NOT REMOVE THESE LINES ''' 
-
 from models import Property # used this line used to migrate table
-
 
 
 ''' Controllers ''' 
@@ -63,6 +61,8 @@ from controllers import enumerations_controller
 EnumerationsController = enumerations_controller.EnumerationsController
 from controllers import properties_controller
 PropertiesController = properties_controller.PropertiesController
+from controllers import ai_model_controller
+AIModelController = ai_model_controller.AIModelController 
 
 
 ''' ROUTES '''
@@ -75,16 +75,42 @@ def welcome_text():
 
 @app.route("/api/adjacent_nodes", methods=["POST"])
 @cross_origin(supports_credentials=True)
-@require_appkey
+# @require_appkey
 def get_adjacent_nodes():
     req = json.loads(request.data)
-    
-    data = PropertiesController()._get_adjacent_nodes(
-        req['longitude'],
-        req['latitude'])
-    
+
+
+    data, five_nearest_ids = PropertiesController()._get_adjacent_nodes(
+        req['lng'],
+        req['lat']
+    )
+
+    community, district = PropertiesController()._get_community_data_from_nearest(
+        five_nearest_ids
+    )
+
+    predicted_price = AIModelController().predict_price(
+        req['lng'],
+        req['lat'],
+        1,2,3,4,5,6,7,
+        # req['address'],
+        # req['bathrooms'],
+        # req['dens'],
+        # req['square_footage'],
+        # req['property_style'],
+        # req['property_type'],
+        # req['parking_spots'],
+        community,
+        district
+    )
+
     response = app.response_class(
-        response=json.dumps(data),
+        response=json.dumps(
+            {
+                "nodes" : data,
+                "predicted_price" : predicted_price 
+            }
+        ),
         status=200,
         mimetype='application/json'
     )

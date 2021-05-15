@@ -69,6 +69,16 @@ class Property(db.Model):
         return res
 
     @staticmethod   
+    def _query_by_ids(ids):
+        engine = create_engine(os.environ["DB_URI"], echo=True)
+        Session = sessionmaker(bind=engine)
+        session = Session()
+        res = session.query(Property).filter(
+            Property.id.in_(ids)
+        ).all()
+        return res
+
+    @staticmethod   
     def _query_all():
         engine = create_engine(os.environ["DB_URI"], echo=True)
         Session = sessionmaker(bind=engine)
@@ -93,7 +103,7 @@ class Property(db.Model):
         return {
             "address" : str(self.address),
             "id" : str(self.id),
-            "lgn": float(self.longitude),
+            "lng": float(self.longitude),
             "lat" : float(self.latitude)
         }
     def __repr__(self):
