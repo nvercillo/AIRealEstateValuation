@@ -10,3 +10,4 @@ Flask-Migrate
 psycopg2-binary
 requests
 scipy
+gunicorn

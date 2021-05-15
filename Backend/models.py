@@ -11,8 +11,7 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship, backref, sessionmaker, joinedload, load_only
 from sqlalchemy.dialects.postgresql import UUID
 
-
-
+# from server import db  # UNCOMMENT WHEN RUNNING MIGRATION
 # if __name__ =="__main__":
 # from server import db
 #     print("SDFSDFS")
@@ -47,7 +46,6 @@ class Property(db.Model):
         self.data = data
         
 
-
     def __as_dict__(self):
         return {key:value for key, value in 
             self.__dict__.items() if not key.startswith('__') 
@@ -56,7 +54,6 @@ class Property(db.Model):
 
     @staticmethod   
     def _query_by_coords(lgn, lat):
-
         engine = create_engine(os.environ["DB_URI"], echo=True)
         Session = sessionmaker(bind=engine)
         session = Session()
@@ -70,10 +67,20 @@ class Property(db.Model):
         session = Session()
         res = session.query(Property).get(id)
         return res
+
+    @staticmethod   
+    def _query_all():
+        engine = create_engine(os.environ["DB_URI"], echo=True)
+        Session = sessionmaker(bind=engine)
+        session = Session()
+        res = session.query(Property).all()
+        return res
+
     
     @staticmethod
     def _insert(bulk_list):
-
+        assert os.environ['DB_URI'] == "postgresql://ijnykwiczlfsrl:2b76aead17ba334800f1360d3c6f37c9f128be22965e08bc23445aa0a9f5cfbc@ec2-54-160-96-70.compute-1.amazonaws.com:5432/d85hoc3itaj780", \
+            print("GOT ", os.environ['DB_URI'])
         engine = create_engine(os.environ["DB_URI"], echo=True)
         Session = sessionmaker(bind=engine)
         session = Session()

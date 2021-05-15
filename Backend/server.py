@@ -7,7 +7,7 @@ from werkzeug.exceptions import default_exceptions
 from flask_cors import CORS, cross_origin
 from functools import wraps
 from waitress import serve
-from utils import Utils
+from utils import Utils, AlchemyEncoder
 from flask import (
     jsonify, 
     Response, 
@@ -20,17 +20,6 @@ from flask import (
 from dotenv import load_dotenv
 from os.path import join, dirname
 load_dotenv(join(dirname(__file__), '.env'))
-
-''' Models '''
-# from models import Property  # uncomment when running migration 
-
-
-''' Controllers ''' 
-from controllers import enumerations_controller
-EnumerationsController = enumerations_controller.EnumerationsController
-from controllers import properties_controller
-PropertiesController = properties_controller.PropertiesController
-
 
 
 ''' SERVER INITIALIZATION AND CONFIG '''
@@ -61,8 +50,19 @@ def require_appkey(view_function):
 ''' allows cross origin communication '''
 CORS(app, support_credentials=True)
 db = SQLAlchemy(app)
-
 ''' END SERVER INITIALIZATION AND CONFIG '''
+
+''' Models DO NOT REMOVE THESE LINES ''' 
+
+from models import Property # used this line used to migrate table
+
+
+
+''' Controllers ''' 
+from controllers import enumerations_controller
+EnumerationsController = enumerations_controller.EnumerationsController
+from controllers import properties_controller
+PropertiesController = properties_controller.PropertiesController
 
 
 ''' ROUTES '''
@@ -103,7 +103,7 @@ def get_amenities_from_id():
     )
 
     response = app.response_class(
-        response=json.dumps(data),
+        response=json.dumps(prop, cls=AlchemyEncoder),
         status=200,
         mimetype='application/json'
     )
@@ -129,6 +129,7 @@ def get_enumations():
 ''' START UP SERVER '''
 if __name__ == '__main__':
     if os.environ['PRODUCTION'] and os.environ['PRODUCTION'] == "True":
+        print(os.environ['DB_URI'])
         print("Started production server .... :)")
         serve(app, host="0.0.0.0", port=5000) # run production server
     else: 

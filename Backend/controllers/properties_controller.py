@@ -11,7 +11,7 @@ class PropertiesController:
         pass
 
     def _get_by_id(self, id):
-        return Property._query_by_id(id).__as_dict__()
+        return Property._query_by_id(id)
 
     def _get_closest_nodes(self, node, nodes):
         arr = distance.cdist([node], nodes)
