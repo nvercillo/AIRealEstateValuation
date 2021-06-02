@@ -1,4 +1,5 @@
 import sys
+import random
 sys.path.insert(0,'..') # import parent folder 
 from models import Property 
 import random
@@ -26,5 +27,4 @@ class AIModelController:
         community,
         district
     ):
-        
-        return str(random.randint(700000, 1500000))
+        return format(random.randint(700000, 2000000), ",")
