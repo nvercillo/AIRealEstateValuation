@@ -1,6 +1,7 @@
 import sys
 sys.path.insert(0,'..') # import parent folder 
 from models import Property 
+import random
 from numpy import random
 from scipy.spatial import distance
 from constant_enums import Enumerations
@@ -25,4 +26,5 @@ class AIModelController:
         community,
         district
     ):
-        return "69,696,6969"
+        
+        return str(random.randint(700000, 1500000))
