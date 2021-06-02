@@ -75,7 +75,7 @@ def welcome_text():
 
 @app.route("/api/adjacent_nodes", methods=["POST"])
 @cross_origin(supports_credentials=True)
-# @require_appkey
+@require_appkey
 def get_adjacent_nodes():
     req = json.loads(request.data)
 
