@@ -152,7 +152,7 @@ def get_enumations():
 ''' END ROUTES '''
 
 
-''' START UP SERVER '''
+''' INSTANTIATE SERVER '''
 if __name__ == '__main__':
     if os.environ['PRODUCTION'] and os.environ['PRODUCTION'] == "True":
         print(os.environ['DB_URI'])
