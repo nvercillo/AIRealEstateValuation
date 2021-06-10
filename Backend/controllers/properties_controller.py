@@ -10,10 +10,10 @@ from utils import mode
 class PropertiesController:
     
     def __init__(self):
-        pass
+        self.property = Property(start_engine=True)
 
     def _get_by_id(self, id):
-        return Property._query_by_id(id)
+        return self.property._query_by_id(id)
 
     def _get_closest_nodes(self, node, nodes,):
         arr = distance.cdist([node], nodes)
@@ -39,7 +39,7 @@ class PropertiesController:
 
     def _get_adjacent_nodes(self, lng, lat):
 
-        res = Property._query_by_coords(lng, lat) 
+        res = self.property._query_by_coords(lng, lat) 
     
         _map = {}
         coords =  []
@@ -67,7 +67,7 @@ class PropertiesController:
 
     def _get_community_data_from_nearest(self, five_nearest_ids):
 
-        res =Property._query_by_ids(five_nearest_ids)
+        res = self.property._query_by_ids(five_nearest_ids)
         print(res)
 
 

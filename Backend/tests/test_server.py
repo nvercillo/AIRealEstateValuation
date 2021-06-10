@@ -31,7 +31,7 @@ def test_home_endpoint(environment, authenticated):
             assert res.status_code == 401 
 
     except Exception as e:
-        print(f"FAILED RUN: environment {environment}, authenticated {authenticated}, exception: {e}")
+        raise Exception(f"FAILED RUN: environment {environment}, authenticated {authenticated}, exception: {e}")
 
 
 @pytest.mark.parametrize("environment, authenticated", [
@@ -40,7 +40,7 @@ def test_home_endpoint(environment, authenticated):
     ("production", True),
     ("production", False)
 ])
-def test_home_endpoint(environment, authenticated):
+def test_amenities(environment, authenticated):
 
     URL = LOCAL_URL if environment == "localhost" else PROD_URL
     URL += "/api/amenities"
@@ -64,9 +64,9 @@ def test_home_endpoint(environment, authenticated):
 
             assert res.status_code == 401
 
-        print(f"PASSED test_home_endpoint: environment {environment}, authenticated {authenticated}")
+        print(f"PASSED test_amenities: environment {environment}, authenticated {authenticated}")
     except Exception as e:
-        print(f"TEST test_home_endpoint FAILED RUN: environment {environment}, authenticated {authenticated}, exception: {e}")
+        raise Exception(f"TEST test_amenities FAILED RUN: environment {environment}, authenticated {authenticated}, exception: {e}")
 
 
 
@@ -91,8 +91,8 @@ def test_enumerations_endpoint(environment, authenticated):
             print(res.text)
             print(".")
             print(".")
-            data = json.loads(res.data)
-            assert isinstance(data, list)
+            data = json.loads(res.text)
+            assert isinstance(data, dict)
             assert len(data) > 0
         else:
             res = requests.get(url=URL)
@@ -100,7 +100,7 @@ def test_enumerations_endpoint(environment, authenticated):
 
         print(f"PASSED test_home_endpoint: environment {environment}, authenticated {authenticated}")
     except Exception as e:
-        print(f"TEST test_home_endpoint FAILED RUN: environment {environment}, authenticated {authenticated}, exception: {e}")
+        raise Exception(f"TEST test_home_endpoint FAILED RUN: environment {environment}, authenticated {authenticated}, exception: {e}")
 
 
 @pytest.mark.parametrize("environment, authenticated", [
@@ -128,18 +128,16 @@ def test_adjacent_nodes_endpoint(environment, authenticated):
             print(res.text)
             print(".")
             print(".")
-            data = json.loads(res.data)
-            assert isinstance(data, list)
-            assert len(data) > 0
+            data = json.loads(res.text)
+            assert isinstance(data, dict)
         else:
             res = requests.post(
                 url=URL, 
                 data=json.dumps({"lng" :  -79.205745, "lat" : 43.810167 })
-                
             )
             assert res.status_code == 401
 
         print(f"PASSED test_home_endpoint: environment {environment}, authenticated {authenticated}")
     except Exception as e:
-        print(f"TEST test_home_endpoint FAILED RUN: environment {environment}, authenticated {authenticated}, exception: {e}")
+        raise Exception(f"TEST test_home_endpoint FAILED RUN: environment {environment}, authenticated {authenticated}, exception: {e}")
 

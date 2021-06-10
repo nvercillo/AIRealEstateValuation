@@ -33,18 +33,27 @@ class Property(db.Model):
     style = db.Column(db.String(255))
     data = db.Column(JSON)
 
-    def __init__(self, address, sold_price, soldOn,
-    soldDate, listedOn, longitude, latitude, style, data):
-        self.address = address
-        self.sold_price = sold_price
-        self.soldOn = soldOn
-        self.soldDate =soldDate
-        self.listedOn = listedOn
-        self.style = style
-        self.longitude = longitude
-        self.latitude = latitude
-        self.data = data
-        
+    def __init__(self, address=None, sold_price=None, soldOn=None,
+    soldDate=None, listedOn=None, longitude=None, latitude=None, style=None, data=None, start_engine=False):
+
+        assert os.environ['DB_URI'] == "postgresql://ijnykwiczlfsrl:2b76aead17ba334800f1360d3c6f37c9f128be22965e08bc23445aa0a9f5cfbc@ec2-54-160-96-70.compute-1.amazonaws.com:5432/d85hoc3itaj780", \
+            print("GOT ", os.environ['DB_URI'])
+
+        engine = create_engine(os.environ["DB_URI"], echo=True)
+        Session = sessionmaker(bind=engine)
+        self.session = Session()
+
+        if not start_engine:
+            self.address = address
+            self.sold_price = sold_price
+            self.soldOn = soldOn
+            self.soldDate =soldDate
+            self.listedOn = listedOn
+            self.style = style
+            self.longitude = longitude
+            self.latitude = latitude
+            self.data = data
+            
 
     def __as_dict__(self):
         return {key:value for key, value in 
@@ -52,50 +61,27 @@ class Property(db.Model):
             and not callable(key) and '_sa_instance' not in key}
 
 
-    @staticmethod   
-    def _query_by_coords(lgn, lat):
-        engine = create_engine(os.environ["DB_URI"], echo=True)
-        Session = sessionmaker(bind=engine)
-        session = Session()
-        res = session.query(Property).all()
+    def _query_by_coords(self, lgn, lat):
+        res = self.session.query(Property).all()
         return res
 
-    @staticmethod   
-    def _query_by_id(id):
-        engine = create_engine(os.environ["DB_URI"], echo=True)
-        Session = sessionmaker(bind=engine)
-        session = Session()
-        res = session.query(Property).get(id)
+    def _query_by_id(self, id):
+        res = self.session.query(Property).get(id)
         return res
 
-    @staticmethod   
-    def _query_by_ids(ids):
-        engine = create_engine(os.environ["DB_URI"], echo=True)
-        Session = sessionmaker(bind=engine)
-        session = Session()
-        res = session.query(Property).filter(
+    def _query_by_ids(self, ids):
+        res = self.session.query(Property).filter(
             Property.id.in_(ids)
         ).all()
         return res
 
-    @staticmethod   
-    def _query_all():
-        engine = create_engine(os.environ["DB_URI"], echo=True)
-        Session = sessionmaker(bind=engine)
-        session = Session()
-        res = session.query(Property).all()
+    def _query_all(self):
+        res = self.session.query(Property).all()
         return res
 
-    
-    @staticmethod
     def _insert(bulk_list):
-        assert os.environ['DB_URI'] == "postgresql://ijnykwiczlfsrl:2b76aead17ba334800f1360d3c6f37c9f128be22965e08bc23445aa0a9f5cfbc@ec2-54-160-96-70.compute-1.amazonaws.com:5432/d85hoc3itaj780", \
-            print("GOT ", os.environ['DB_URI'])
-        engine = create_engine(os.environ["DB_URI"], echo=True)
-        Session = sessionmaker(bind=engine)
-        session = Session()
         for obj in bulk_list:
-            session.add(obj)
+            self.session.add(obj)
         session.commit()
 
 
