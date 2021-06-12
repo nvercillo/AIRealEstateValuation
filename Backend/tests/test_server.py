@@ -52,7 +52,6 @@ def test_amenities(environment, authenticated):
                 url=URL,
                 params={"id" : "00159f42-8e6d-4c85-ad17-28942a8dd700"}
             )
-            
             print(".")
             print(".")
             print(res.text)
@@ -85,12 +84,12 @@ def test_enumerations_endpoint(environment, authenticated):
         if authenticated:
             URL += f"?key={os.environ['API_KEY']}"
             res = requests.get(url=URL)
-            assert res.status_code == 200
             print(".")
             print(".")
             print(res.text)
             print(".")
             print(".")
+            assert res.status_code == 200
             data = json.loads(res.text)
             assert isinstance(data, dict)
             assert len(data) > 0
@@ -105,9 +104,9 @@ def test_enumerations_endpoint(environment, authenticated):
 
 @pytest.mark.parametrize("environment, authenticated", [
     ("localhost", True),
-    ("localhost", False),
-    ("production", True),
-    ("production", False)
+    # ("localhost", False),
+    # ("production", True),
+    # ("production", False)
 ])
 def test_adjacent_nodes_endpoint(environment, authenticated):
 
@@ -117,22 +116,37 @@ def test_adjacent_nodes_endpoint(environment, authenticated):
     try: 
         if authenticated:
             URL += f"?key={os.environ['API_KEY']}"
+            print(URL)
             res = requests.post(
                 url=URL, 
-                data=json.dumps({"lng" :  -79.205745, "lat" : 43.810167 })
+                data=json.dumps(
+                    {
+                        "lng" :  -79.205745, 
+                        "lat" : 43.810167,
+                        "Sqaurefootage" : "900-999" ,
+                        "Type" : "Detached",
+                        "Style" : "Loft",
+                        "Bedrooms" : 2,
+                        "Dens" : 2,
+                        "Bathrooms" : 3,
+                        "ParkingTotal" :  4
+                    }
+                )
                 
             )
-            assert res.status_code == 200
             print(".")
             print(".")
             print(res.text)
             print(".")
             print(".")
+            assert res.status_code == 200
             data = json.loads(res.text)
+
+            print(f"PREDICTED PRICE =  {data['predicted_price']}")
             assert isinstance(data, dict)
         else:
             res = requests.post(
-                url=URL, 
+                url=URL,
                 data=json.dumps({"lng" :  -79.205745, "lat" : 43.810167 })
             )
             assert res.status_code == 401

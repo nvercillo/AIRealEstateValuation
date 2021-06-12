@@ -79,30 +79,30 @@ def welcome_text():
 def get_adjacent_nodes():
     req = json.loads(request.data)
 
-
     data, five_nearest_ids = PropertiesController()._get_adjacent_nodes(
         req['lng'],
         req['lat']
     )
-
+    
     community, district = PropertiesController()._get_community_data_from_nearest(
         five_nearest_ids
     )
 
-    predicted_price = AIModelController().predict_price(
-        req['lng'],
-        req['lat'],
-        1,2,3,4,5,6,7,
-        # req['address'],
-        # req['bathrooms'],
-        # req['dens'],
-        # req['square_footage'],
-        # req['property_style'],
-        # req['property_type'],
-        # req['parking_spots'],
+    # predicted_price = AIModelController().dummy_predict_price()
+    
+    predicted_price = AIModelController().predict_price([
+        # req['lng'],
+        # req['lat'],
+        req['Sqaurefootage'],
+        req['Type'],
+        req['Style'],
         community,
-        district
-    )
+        district.split(" ")[1],
+        req['Bedrooms'],
+        req['Dens'],
+        req['Bathrooms'],
+        req['ParkingTotal']
+    ])
 
     response = app.response_class(
         response=json.dumps(

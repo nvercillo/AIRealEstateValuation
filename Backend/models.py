@@ -39,7 +39,9 @@ class Property(db.Model):
         assert os.environ['DB_URI'] == "postgresql://ijnykwiczlfsrl:2b76aead17ba334800f1360d3c6f37c9f128be22965e08bc23445aa0a9f5cfbc@ec2-54-160-96-70.compute-1.amazonaws.com:5432/d85hoc3itaj780", \
             print("GOT ", os.environ['DB_URI'])
 
-        engine = create_engine(os.environ["DB_URI"], echo=True)
+        engine = create_engine(
+            os.environ["DB_URI"], 
+            echo=not (os.environ['PRODUCTION'] and os.environ['PRODUCTION'] == "True"))
         Session = sessionmaker(bind=engine)
         self.session = Session()
 
@@ -61,8 +63,14 @@ class Property(db.Model):
             and not callable(key) and '_sa_instance' not in key}
 
 
-    def _query_by_coords(self, lgn, lat):
-        res = self.session.query(Property).all()
+    ''' Function gets all nodes within a range of two long and lats '''
+    def _query_by_coord_range(self, lng_above, lng_below, lat_above, lat_below):
+        res = self.session.query(Property).filter(
+            Property.latitude > lat_below,
+            Property.latitude < lat_above,
+            Property.longitude < lng_above,
+            Property.latitude > lng_below
+        ).all()
         return res
 
     def _query_by_id(self, id):
@@ -96,7 +104,7 @@ class Property(db.Model):
         return f'<address {self.address}, id {self.id}>'
 
     def __str__(self):
-        return f'<address {self.address}, id {self.id}, lgn {self.longitude}, lat {self. latitude}>'
+        return f'<address {self.address}, id {self.id}, lng {self.longitude}, lat {self. latitude}>'
 
 
 
