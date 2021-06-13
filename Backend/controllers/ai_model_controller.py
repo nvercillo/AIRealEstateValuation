@@ -6,7 +6,7 @@ from numpy import random
 from scipy.spatial import distance
 from constant_enums import Enumerations
 import math
-import keras
+from tensorflow import keras
 loaded_model = keras.models.load_model('ai-model')
 
 

@@ -68,7 +68,6 @@ AIModelController = ai_model_controller.AIModelController
 ''' ROUTES '''
 @app.route("/")
 @cross_origin(supports_credentials=True)
-@require_appkey
 def welcome_text():
     return "This is an authenticated server :)"
 
