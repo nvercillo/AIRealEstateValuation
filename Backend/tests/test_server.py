@@ -103,9 +103,9 @@ def test_enumerations_endpoint(environment, authenticated):
 
 
 @pytest.mark.parametrize("environment, authenticated", [
-    # ("localhost", True),
+    ("localhost", True),
     # ("localhost", False),
-    ("production", True)
+    # ("production", True)
     # ("production", False)
 ])
 def test_adjacent_nodes_endpoint(environment, authenticated):
