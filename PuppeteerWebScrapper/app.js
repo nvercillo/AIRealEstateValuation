@@ -1,9 +1,8 @@
 const puppeteer = require('puppeteer');
-const tools = require('./tools')
 
-function scrap_data_starting_at_page(pageNum){
+function scrap_images_starting_at_page(pageNum=1){
     puppeteer.launch({ 
-        executablePath: 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe',
+        executablePath: '/usr/bin/google-chrome-stable',
         headless: false,
         userAgent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/85.0.4183.83 Safari/537.36",
         args: ['--no-sandbox', '--disable-setuid-sandbox', '--window-size=1920,1080'] 
@@ -93,59 +92,9 @@ function scrap_data_starting_at_page(pageNum){
                         }
 
                         let pagedata = await page.evaluate(() => {
-
-                            const AMENITIES = [
-                                "Groceries",
-                                "Liquor Store",
-                                "Restaurants",
-                                "Coffee",
-                                "Bank",
-                                "Gas Station",
-                                "Health & Fitness",
-                                "Park",
-                                "Library",
-                                "Medical Care",
-                                "Pharmacy",
-                                "Mall",
-                                "Movie Theatre",
-                                "Bar"
-                            ]
-
-                            const VALUABLE_CAT = [
-                                "List Date",
-                                "Sold Date",
-                                "Type",
-                                "Style",
-                                "Area",
-                                "Municipality",
-                                "Community",
-                                "List Price",
-                                "Bedrooms",
-                                "Bathrooms",
-                                "Kitchens",
-                                "Rooms",
-                                "Parking Total",
-                                "Municipality District"
-                            ]
                             
                         
                             try{
-                                // create a set of known columns in the middle of the page, check to see nothing weird is coming up
-                                const possibleColumns = new Set();
-                                possibleColumns.add('Type');
-                                possibleColumns.add('Style');
-                                possibleColumns.add('Size');
-                                possibleColumns.add('Lot Size');
-                                possibleColumns.add('Age');
-                                possibleColumns.add('Taxes');
-                                possibleColumns.add('Walk Score');
-                                possibleColumns.add('Pets');
-                                possibleColumns.add('Days on Site');
-                                possibleColumns.add('Maintenance Fees');
-                                possibleColumns.add('Lease Term');
-                                possibleColumns.add('Possession');
-                                possibleColumns.add('All Inclusive');
-                                
                                 // get all the spans
                                 let spans =  document.querySelectorAll('span[class="priv"]');
                                 
@@ -154,125 +103,10 @@ function scrap_data_starting_at_page(pageNum){
                                     return -3;
                                 }
 
-                                
-                                let col_names =  document.querySelectorAll('dt[class="column-label"]');
-
-                                // skip Walk Score cause this is being weird
-                                let temp = [];
-                                for (var tt = 0 ; tt < col_names.length; tt++){
-                                    if (col_names[tt].innerText.localeCompare('Walk Score') != 0){
-                                        temp.push(col_names[tt]);
-                                    }
-                                }
-                                col_names = temp;
-
                                 // all of these are the same for each page
                                 let address =  document.querySelector('section>h1').innerText;
-                                let bedNum = spans[0].innerText;
-                                let bathNum = spans[1].innerText;
-                                let sqarefootage = spans[2].innerText;
-                                let sold_price = spans[3].innerText;
                                 let soldOn = spans[6].innerText;
-
-
-                                // init return
-                                obj = {
-                                    'sold_price': sold_price,
-                                    'address' : address,
-                                    'bedNum': bedNum,
-                                    'bathNum': bathNum,
-                                    'sqarefootage' : sqarefootage,
-                                    'soldOn' : soldOn,
-                                }
                                 
-                                var CATEGORIES = document.querySelectorAll('div[class="column-container column-break-inside-avoid"]')
-                                
-                                
-                                for (var k =0; k<CATEGORIES.length; k++){
-                                    var text_arr  = CATEGORIES[k].innerText.split("\n")
-                                    console.log(text_arr)
-                                    for (var j =1; j<text_arr.length; j+=3){
-                                        if (VALUABLE_CAT.includes(text_arr[j])){
-                                            obj[text_arr[j]] = text_arr[j + 1]
-                                        }
-                                    }
-
-                                }
-
-                                let divs = document.querySelectorAll('div[class="media-heading"]');
-                                
-                                var amenities = [] 
-                                for (var k =0; k<divs.length; k++){
-                                    amenities.push(divs[k].innerText)
-                                }
-                                
-                                let sub_divs =  document.querySelectorAll('div[class="media-sub-heading"]');
-                                
-                                var dists = []
-                                for (var k =0; k<sub_divs.length; k++){
-                                    dists.push(sub_divs[k].innerText)
-                                }
-                                
-                                console.log(dists)
-                                console.log(amenities)
-                                
-                                var found_amenities_ind = {}
-                                var count = 0
-                                for (var j =11; j< amenities.length; j+=4){
-                                    am = amenities[j]
-                                    if (am.charAt(am.length-2) == 'k' && am.charAt(am.length-1) == 'm')
-                                        am = am.substring(0, am.length-2)
-                                    
-                                    am = am.replace(/[^A-Za-z\s]/g, '') // only keep letters in string
-                                    am = am.trim()
-                                    
-                                    console.log(am)
-                                    if (AMENITIES.includes(am)){
-                                        found_amenities_ind[count] = am
-                                        obj[am.concat(" #1 name")] = amenities[j +1]
-                                        obj[am.concat(" #2 name")] = amenities[j +2]
-                                        obj[am.concat(" #3 name")] = amenities[j +3]
-                                    }
-                                    count ++
-                                }
-                                
-                                
-                                function get_entry(j, k){   
-                                    var string = dists[parseInt(j)*3 +10 +k ]
-                                
-                                    var s_arr = string.split(" ")
-                                    var distance = s_arr[s_arr.length -2]
-                                
-                                    if (string.charAt(string.length-2) == 'k'&& string.charAt(string.length-1) == 'm')
-                                        string = string.substring(0, string.length-2)
-                                    
-                                    var address = string.replace(/[^A-Za-z\s]/g, '')
-                                    address = s_arr[0].concat(address)
-                                    address = address.replace("\n", "")
-                                    address = address.substring(0, address.length-4)
-                                    distance = distance.replace("\n", "")
-                                    return [address, distance]
-                                }
-                                
-                                for (var j in found_amenities_ind){
-                                    var am = found_amenities_ind[j]
-                                    
-                                    var first = get_entry(j, 0)
-                                    var second = get_entry(j, 1)
-                                    var third = get_entry(j, 2)
-                                    obj[am.concat(" #1 address")] = first[0]
-                                    obj[am.concat(" #2 address")] = second[0]
-                                    obj[am.concat(" #3 address")] = third[0]
-                                
-                                    obj[am.concat(" #1 distance")] = first[1]
-                                    obj[am.concat(" #2 distance")] = second[1]
-                                    obj[am.concat(" #3 distance")] = third[1]
-                                    
-                                }
-                                
-
-                                console.log(obj)
-                                return obj;
                             } catch(err){
                                 return -1
                             }
@@ -295,41 +129,10 @@ function scrap_data_starting_at_page(pageNum){
 
                         pagedata['address'] = str;
 
-                        // get coords from address
-                        let coords = await tools.coords(pagedata['address']);
-                        
-                        console.log(pagedata['address'])
-                        console.log(coords)
 
-                        if ('error' in coords || 
-                            Math.abs(coords['lat'] -TOlat) > 5 || 
-                            Math.abs(coords['lon'] - TOlong) > 5
-                        ){
-                            console.log("geodata error");
-                            continue;
-                            // throw new BadRowError("geodata error");
-                        }
-
-                        pagedata['longitude'] = coords['lon'];
-                        pagedata['latitude'] = coords['lat'];
-                        
                         pagedata['pageNum'] = pageNum;
                         pagedata['iterationNum'] = i;
-                        pagedata['weblink'] = urls[i]
-                        console.log(pagedata);
-
-
-                        // convert json to string
-                        pagedata = JSON.stringify(pagedata);
-                        
-                        // save json object to data folder
-                        
-                        csvCols.push(pagedata);
-                        
-                        if (csvCols.length >= MAXCOLS){
-                            write_to_file(csvCols)
-                            csvCols = [];
-                        }
+                        pagedata['weblink'] = urls[i]                        
 
                     }
                 }
@@ -359,4 +162,4 @@ class BadRowError extends Error {
 
 
 
-scrap_data_starting_at_page(97)
+scrap_images_starting_at_page()
