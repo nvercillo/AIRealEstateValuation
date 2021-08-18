@@ -87,21 +87,21 @@ def get_adjacent_nodes():
         five_nearest_ids
     )
 
-    # predicted_price = AIModelController().dummy_predict_price()
+    predicted_price = AIModelController().dummy_predict_price()
     
-    predicted_price = AIModelController().predict_price([
-        # req['lng'],
-        # req['lat'],
-        req['Sqaurefootage'],
-        req['Type'],
-        req['Style'],
-        community,
-        district.split(" ")[1],
-        req['Bedrooms'],
-        req['Dens'],
-        req['Bathrooms'],
-        req['ParkingTotal']
-    ])
+    # predicted_price = AIModelController().predict_price([
+    #     # req['lng'],
+    #     # req['lat'],
+    #     req['Sqaurefootage'],
+    #     req['Type'],
+    #     req['Style'],
+    #     community,
+    #     district.split(" ")[1],
+    #     req['Bedrooms'],
+    #     req['Dens'],
+    #     req['Bathrooms'],
+    #     req['ParkingTotal']
+    # ])
 
     response = app.response_class(
         response=json.dumps(
