@@ -7,11 +7,16 @@ from scipy.spatial import distance
 from utils import  Math
 from operator import itemgetter
 
+# from dotenv import load_dotenv
+# from os.path import join, dirname
+# load_dotenv(join(dirname(__file__), '../.env'))
+
 
 class PropertiesController:
 
     RADIUS_OF_VIEWABILITY = 0.8 # km 
     CLOSEST_VIEWABLE_DISTANCE_DIFF = 0.01 # km 
+    SEARCHABLE_DISTACNE = 2 # how big should we make the initial query in km 
 
     def __init__(self):
         self.property = Property(start_engine=True)
@@ -86,7 +91,7 @@ class PropertiesController:
         
         stop_ind =len(dists)
         for i in range(len(dists)):
-            if dists[i][0] > 1:  # grab nodes within 1 km 
+            if dists[i][0] > self.SEARCHABLE_DISTACNE:  # grab nodes within 1 km 
                 stop_ind = i
                 break 
 
@@ -130,5 +135,5 @@ class PropertiesController:
         for ind in reversed([g for g in in_group]):
             sorted_arr.pop(ind)
 
-# res = PropertiesController()._get_adjacent_nodes(-79.205745, 43.810167)
+# res = PropertiesController()._get_adjacent_nodes( lng= -79.384610 ,lat = 43.697070)
 # print(len(res[0]))
