@@ -33,6 +33,6 @@ if res.status_code != 200:
 else:
     print("RUN PASSED")
     f = open("logfile.txt", "a+")
-    f.write(f"Time failed: {current_time}\n")
+    f.write(f"Time passed: {current_time}\n")
 
 f.close()
