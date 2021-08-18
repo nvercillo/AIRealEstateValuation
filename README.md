@@ -1,4 +1,4 @@
-# AI Real Estate Valuation (in progress)
+# AI Real Estate Valuation
 
 ## Repo Principles
 
