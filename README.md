@@ -33,7 +33,11 @@ All of these unique exponetial funcitons are calculated using a secondary model.
 ## Backend 
 
 ### Setup 
-Requirements: python3 as python, pip3 as pip, virtuenv-python, Postgres
+Requirements: python3 as python, pip3 as pip, virtuenv-python, MySql
+
+sudo apt-get install libmysqlclient-dev
+sudo apt-get install libssl-dev
+pip install mysqlclient
 
 * On Linux: 
 
