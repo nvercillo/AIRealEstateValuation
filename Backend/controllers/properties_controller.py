@@ -30,8 +30,8 @@ class PropertiesController:
         lat_diff = Math().calc_max_lat_deviance(self.RADIUS_OF_VIEWABILITY, lng)
 
         res = self.property._query_by_coord_range(
-            lng_above=lng+lon_diff,
-            lng_below=lng-lon_diff,
+            lng_above=lng+2*lon_diff,
+            lng_below=lng-2*lon_diff,
             lat_above=lat+lat_diff,
             lat_below=lat-lat_diff
         )
