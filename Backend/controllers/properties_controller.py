@@ -2,7 +2,7 @@ import json
 import sys
 sys.path.insert(0,'..') # import parent folder 
 from models import Property 
-from numpy import random
+import numpy as np
 from scipy.spatial import distance
 from scipy.stats import zscore
 from utils import  Math
@@ -50,14 +50,30 @@ class PropertiesController:
 
         return res
 
-    
+
+    ''' FUNCTION DESCRIPTION: 
+        @breif: returns the predicted price and the relative error on this prediction
+        @description: 
+            Step 1: Calculate the relative inverse of distance z-scores sum              
+            Step 2: Iterate through nearby node to find  the ratio logarithmic 
+                    decay of each node to the inverse distance zss
+            Step 3: Use this ratio to find the a, and b values in the 
+                    polynomial function that will approximate distance to the 
+                    variance of price
+            Step 4: Use a, b, to create new variance fn for given node, calc 
+                    variance for each node and the ratio of the varaince to the
+                    inverse logarithmic decay fn of varaiance
+            Step 5: Use the ratio of inverse logarithmic decay to the sum of decays 
+                    to multiply by each price and the errors to find predictied price 
+                    and the relative error on the predicted value
+    '''     
     def get_location_ai_data(self):  # multi thread this to make it faster 
 
         nearby = self.query_by_coords_and_filter(
-            self.longitude
+            self.longitude,
             self.latitude,
-            filters={"style" : self.style}
-            SEARCHING_DISTANCE=SEARCHABLE_DISTANCE
+            filters={"style" : self.style}, 
+            SEARCHING_DISTANCE=self.SEARCHABLE_DISTANCE
         )
 
         distances = [] 
@@ -77,39 +93,27 @@ class PropertiesController:
         max_iterations = min(self.NUM_NEARBY_CONSIDERED_FOR_AI, len(prices))
         
 
-        ''' create z score array of distances '''         
-        z_dists = stats.zscore(  # multi 
+        ''' Step 1: create z score array of distances '''         
+        z_dists = zscore(  # multi 
             np.array(
                 # there are less nodes in the array than NUM_NEARBY_CONSIDERED_FOR_AI
                 distances[:max_iterations]
             )
         )
 
-        # ''' create z score array of distances '''
-        # z_prices = stats.zscore( # multi 
-        #     np.array(
-        #         # there are less nodes in the array than NUM_NEARBY_CONSIDERED_FOR_AI
-        #         prices[:max_iterations]
-        #     )
-        # )
 
         # after 1 standard deviations the output becomse insignificant
         z_dists = [1 * abs(z) for z in z_dists]   # score is now a variance, not absolute z_score
-        # z_prices = [1 * abs(z) for z in z_prices]  # score is now a variance, not absolute z_score
 
 
         inverse_distance_scores_sum = 0 
-        inverse_price_scores_sum = 0 
         
-
         for i in range(max_iterations):
 
             # 1/(x +0.1) normalized function using with a max of 10 using z_score
             inverse_distance_scores_sum += 1 / (z_dists[i] + 0.1)
-            # inverse_price_scores_sum += 1 / (z_prices[i] + 0.1 )
-        
 
-                    
+                            
         # variables for the equation a * x *x + b*x + c 
         a = 0
         b = 0 
@@ -119,8 +123,6 @@ class PropertiesController:
         # get the NUM_NEARBY_CONSIDERED_FOR_AI nearest properties and average their fitted lines
         for i in range(max_iterations):
             node = nearby[i]
-            lng = node.longitude
-            lat = node.latitude
 
             a_val = node.ai_data["a"] 
             b_val = node.ai_data["b"]
@@ -143,12 +145,14 @@ class PropertiesController:
             if i > 1 and a < 0 and variances[i] < variances[i-1] : # max reached
                 stop_ind = i
                 break
-            else:
-                
+            else:                
                 # 1/(x +0.1) normalized function using with a max of 10 using z_score
                 inverse_variance_sum += 1 / ( variances[i] + 0.1)
 
+
+        # calculate root sum squared val 
         predicted_price = 0 
+        RSS_of_variance = 0 
         for i in range(stop_ind):
             node = nearby[i]
             price = node.sold_price
@@ -157,22 +161,18 @@ class PropertiesController:
 
             predicted_price += price * (variance_function_val / inverse_variance_sum)
 
-            # calculate root sum squared val 
-            RSS_of_variance += ( variance[i] * (variance_function_val / inverse_variance_sum) ) ** 2
+            
+            RSS_of_variance += ( variances[i] * (variance_function_val / inverse_variance_sum) ) ** 2
 
 
         RSS_of_variance **= 0.5  # sqaure root squared sums
-
         relative_error = RSS_of_variance / predicted_price
-
 
         return {
             "predicted_price" : predicted_price,
             "relative_error" : relative_error
         }    
         
-
-
 
     def _get_adjacent_nodes(self, lng, lat):
 
