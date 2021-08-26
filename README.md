@@ -39,6 +39,12 @@ sudo apt-get install libmysqlclient-dev
 sudo apt-get install libssl-dev
 pip install mysqlclient
 
+pip install black 
+
+### Formatting
+
+USE BLACK FORMATTER TO AVOID MERGE CONFLICTS AND IMPROVE CODE QUALITY
+
 * On Linux: 
 
 cd backend 
