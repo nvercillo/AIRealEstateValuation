@@ -1,4 +1,4 @@
-import os 
+import os
 import uuid
 import psycopg2
 from flask import Flask, jsonify
@@ -17,15 +17,15 @@ from sqlalchemy.dialects.postgresql import UUID
 #     print("SDFSDFS")
 # else:
 db = SQLAlchemy()
-    
+
 
 class Property(db.Model):
-    __tablename__ = 'PROPERTIES'
+    __tablename__ = "PROPERTIES"
 
     id = db.Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     address = db.Column(db.String(255), index=True)
-    longitude = db.Column(db.Numeric(9,6), index=True)
-    latitude = db.Column(db.Numeric(9,6), index=True)
+    longitude = db.Column(db.Numeric(9, 6), index=True)
+    latitude = db.Column(db.Numeric(9, 6), index=True)
     sold_price = db.Column(db.Float)
     soldOn = db.Column(db.DateTime)
     soldDate = db.Column(db.DateTime)
@@ -33,15 +33,29 @@ class Property(db.Model):
     style = db.Column(db.String(255))
     data = db.Column(JSON)
 
-    def __init__(self, address=None, sold_price=None, soldOn=None,
-    soldDate=None, listedOn=None, longitude=None, latitude=None, style=None, data=None, start_engine=False):
+    def __init__(
+        self,
+        address=None,
+        sold_price=None,
+        soldOn=None,
+        soldDate=None,
+        listedOn=None,
+        longitude=None,
+        latitude=None,
+        style=None,
+        data=None,
+        start_engine=False,
+    ):
 
-        assert os.environ['DB_URI'] == "postgresql://ijnykwiczlfsrl:2b76aead17ba334800f1360d3c6f37c9f128be22965e08bc23445aa0a9f5cfbc@ec2-54-160-96-70.compute-1.amazonaws.com:5432/d85hoc3itaj780", \
-            print("GOT ", os.environ['DB_URI'])
+        assert (
+            os.environ["DB_URI"]
+            == "postgresql://ijnykwiczlfsrl:2b76aead17ba334800f1360d3c6f37c9f128be22965e08bc23445aa0a9f5cfbc@ec2-54-160-96-70.compute-1.amazonaws.com:5432/d85hoc3itaj780"
+        ), print("GOT ", os.environ["DB_URI"])
 
         engine = create_engine(
-            os.environ["DB_URI"], 
-            echo=not (os.environ['PRODUCTION'] and os.environ['PRODUCTION'] == "True"))
+            os.environ["DB_URI"],
+            echo=not (os.environ["PRODUCTION"] and os.environ["PRODUCTION"] == "True"),
+        )
         Session = sessionmaker(bind=engine)
         self.session = Session()
 
@@ -49,28 +63,35 @@ class Property(db.Model):
             self.address = address
             self.sold_price = sold_price
             self.soldOn = soldOn
-            self.soldDate =soldDate
+            self.soldDate = soldDate
             self.listedOn = listedOn
             self.style = style
             self.longitude = longitude
             self.latitude = latitude
             self.data = data
-            
 
     def __as_dict__(self):
-        return {key:value for key, value in 
-            self.__dict__.items() if not key.startswith('__') 
-            and not callable(key) and '_sa_instance' not in key}
+        return {
+            key: value
+            for key, value in self.__dict__.items()
+            if not key.startswith("__")
+            and not callable(key)
+            and "_sa_instance" not in key
+        }
 
+    """ Function gets all nodes within a range of two long and lats """
 
-    ''' Function gets all nodes within a range of two long and lats '''
     def _query_by_coord_range(self, lng_above, lng_below, lat_above, lat_below):
-        res = self.session.query(Property).filter(
-            Property.latitude > lat_below,
-            Property.latitude < lat_above,
-            Property.longitude < lng_above,
-            Property.latitude > lng_below
-        ).all()
+        res = (
+            self.session.query(Property)
+            .filter(
+                Property.latitude > lat_below,
+                Property.latitude < lat_above,
+                Property.longitude < lng_above,
+                Property.latitude > lng_below,
+            )
+            .all()
+        )
         return res
 
     def _query_by_id(self, id):
@@ -78,9 +99,7 @@ class Property(db.Model):
         return res
 
     def _query_by_ids(self, ids):
-        res = self.session.query(Property).filter(
-            Property.id.in_(ids)
-        ).all()
+        res = self.session.query(Property).filter(Property.id.in_(ids)).all()
         return res
 
     def _query_all(self):
@@ -92,20 +111,16 @@ class Property(db.Model):
             self.session.add(obj)
         session.commit()
 
-
     def __as_small_dict__(self):
         return {
-            "address" : str(self.address),
-            "id" : str(self.id),
+            "address": str(self.address),
+            "id": str(self.id),
             "lng": float(self.longitude),
-            "lat" : float(self.latitude)
+            "lat": float(self.latitude),
         }
+
     def __repr__(self):
-        return f'<address {self.address}, id {self.id}>'
+        return f"<address {self.address}, id {self.id}>"
 
     def __str__(self):
-        return f'<address {self.address}, id {self.id}, lng {self.longitude}, lat {self. latitude}>'
-
-
-
-
+        return f"<address {self.address}, id {self.id}, lng {self.longitude}, lat {self. latitude}>"

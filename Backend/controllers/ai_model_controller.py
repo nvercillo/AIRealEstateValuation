@@ -1,7 +1,8 @@
 import sys
 import random
-sys.path.insert(0,'..') # import parent folder 
-from models import Property 
+
+sys.path.insert(0, "..")  # import parent folder
+from models import Property
 from numpy import random
 from scipy.spatial import distance
 from constant_enums import Enumerations
@@ -12,9 +13,7 @@ import math
 # loaded_model = keras.models.load_model('ai-model')
 
 
-
 class AIModelController:
-    
     def __init__(self):
         pass
 
@@ -83,7 +82,7 @@ class AIModelController:
                                 'E09' : 'district_bin_13',\
                                 'W10' : 'district_bin_14'}"
 
-        district_encode_int =  "{'district_bin_12':17,\
+        district_encode_int = "{'district_bin_12':17,\
                                 'district_bin_9':18,\
                                 'district_bin_10':19,\
                                 'district_bin_3':20,\
@@ -267,38 +266,131 @@ class AIModelController:
         District_Dict_Int = eval(district_encode_int)
 
         # Normalization array
-        normalize = [1.00000000e+00, 1.00000000e+00, 1.00000000e+00,
-                    1.00000000e+00, 1.00000000e+00, 1.00000000e+00, 1.00000000e+00,
-                    1.00000000e+00, 1.00000000e+00, 1.00000000e+00, 1.00000000e+00,
-                    1.00000000e+00, 1.00000000e+00, 1.25000000e-01, 2.50000000e-01,
-                    1.42857143e-01, 1.25000000e-01, 1.00000000e+00, 1.00000000e+00,
-                    1.00000000e+00, 1.00000000e+00, 1.00000000e+00, 1.00000000e+00,
-                    1.00000000e+00, 1.00000000e+00, 1.00000000e+00, 1.00000000e+00,
-                    1.00000000e+00, 1.00000000e+00, 1.00000000e+00, 1.00000000e+00,
-                    1.00000000e+00, 1.00000000e+00, 1.00000000e+00, 1.00000000e+00,
-                    1.00000000e+00, 1.00000000e+00, 1.00000000e+00, 1.00000000e+00,
-                    1.00000000e+00, 1.00000000e+00, 1.00000000e+00, 1.00000000e+00,
-                    1.00000000e+00, 1.00000000e+00, 1.00000000e+00, 1.00000000e+00,
-                    1.00000000e+00, 1.00000000e+00, 1.00000000e+00, 1.00000000e+00,
-                    1.00000000e+00, 1.00000000e+00, 1.00000000e+00, 1.00000000e+00,
-                    1.00000000e+00, 3.33808201e-01]
+        normalize = [
+            1.00000000e00,
+            1.00000000e00,
+            1.00000000e00,
+            1.00000000e00,
+            1.00000000e00,
+            1.00000000e00,
+            1.00000000e00,
+            1.00000000e00,
+            1.00000000e00,
+            1.00000000e00,
+            1.00000000e00,
+            1.00000000e00,
+            1.00000000e00,
+            1.25000000e-01,
+            2.50000000e-01,
+            1.42857143e-01,
+            1.25000000e-01,
+            1.00000000e00,
+            1.00000000e00,
+            1.00000000e00,
+            1.00000000e00,
+            1.00000000e00,
+            1.00000000e00,
+            1.00000000e00,
+            1.00000000e00,
+            1.00000000e00,
+            1.00000000e00,
+            1.00000000e00,
+            1.00000000e00,
+            1.00000000e00,
+            1.00000000e00,
+            1.00000000e00,
+            1.00000000e00,
+            1.00000000e00,
+            1.00000000e00,
+            1.00000000e00,
+            1.00000000e00,
+            1.00000000e00,
+            1.00000000e00,
+            1.00000000e00,
+            1.00000000e00,
+            1.00000000e00,
+            1.00000000e00,
+            1.00000000e00,
+            1.00000000e00,
+            1.00000000e00,
+            1.00000000e00,
+            1.00000000e00,
+            1.00000000e00,
+            1.00000000e00,
+            1.00000000e00,
+            1.00000000e00,
+            1.00000000e00,
+            1.00000000e00,
+            1.00000000e00,
+            1.00000000e00,
+            3.33808201e-01,
+        ]
 
         # Addition array
-        addition = [0,          0,          0,          0,          0,
-                    0,          0,          0,          0,          0,          0,
-                    0,          0,          0,          0,         -0.14285714,  0,
-                    0,          0,          0,          0,          0,          0,
-                    0,          0,          0,          0,          0,          0,
-                    0,          0,          0,          0,          0,          0,
-                    0,          0,          0,          0,          0,          0,
-                    0,          0,          0,          0,          0,          0,
-                    0,          0,          0,          0,          0,          0,
-                    0,          0,          0,         -1.84310893]
+        addition = [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            -0.14285714,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            -1.84310893,
+        ]
 
         def process_array(input_array):
-            
+
             output_array = [0] * 57
-            
+
             # type and style
             output_array[Type_Dict[input_array[1]]] = 1
             output_array[Style_Dict[input_array[2]]] = 1
@@ -314,10 +406,15 @@ class AIModelController:
             output_array[District_Dict_Int[District_Dict_Bin[input_array[4]]]] = 1
 
             # squarefootage
-            output_array[56] = math.log(sum(list(map(int, input_array[0].split('-'))))/2)
+            output_array[56] = math.log(
+                sum(list(map(int, input_array[0].split("-")))) / 2
+            )
 
             # normalize and addition
-            output_array = [num1*num2+num3 for num1, num2, num3 in zip(output_array,normalize,addition)]
+            output_array = [
+                num1 * num2 + num3
+                for num1, num2, num3 in zip(output_array, normalize, addition)
+            ]
             ml_array = [output_array]
             return ml_array
 
@@ -327,16 +424,13 @@ class AIModelController:
 
         prediction = loaded_model.predict(output)
         y_0 = prediction[0][0]
-        print('Prediction with scaling - {}',format(y_0))
+        print("Prediction with scaling - {}", format(y_0))
         y_0 -= 0.029517638588912886
         y_0 /= 1.4398848092152627e-07
-        y_0 = format(int(y_0/1000) *1000, ",")
-
+        y_0 = format(int(y_0 / 1000) * 1000, ",")
 
         print("Housing Price Prediction  - ${}".format(y_0))
         return y_0
-    
 
-        
     def dummy_predict_price(self, *args):
         return format(random.randint(700000, 2000000), ",")
