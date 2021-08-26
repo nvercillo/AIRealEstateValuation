@@ -4,6 +4,7 @@ sys.path.insert(0,'..') # import parent folder
 from models import Property 
 from numpy import random
 from scipy.spatial import distance
+from scipy.stats import zscore
 from utils import  Math
 from operator import itemgetter
 
@@ -16,7 +17,8 @@ class PropertiesController:
 
     RADIUS_OF_VIEWABILITY = 0.8 # km 
     CLOSEST_VIEWABLE_DISTANCE_DIFF = 0.01 # km 
-    SEARCHABLE_DISTACNE = 2 # how big should we make the initial query in km 
+    SEARCHABLE_DISTANCE = 2 # how big should we make the initial query in km 
+    NUM_NEARBY_CONSIDERED_FOR_AI = 50
 
     def __init__(self):
         self.property = Property(start_engine=True)
@@ -24,24 +26,157 @@ class PropertiesController:
     def _get_by_id(self, id):
         return self.property._query_by_id(id)
     
-    def query_by_coords(self, lng, lat):
+    def query_by_coords_and_filter(
+        self, 
+        lng, 
+        lat, 
+        filters=False,
+        SEARCHING_DISTANCE=None
+    ):
 
-        lon_diff = Math().calc_max_lon_deviance(self.RADIUS_OF_VIEWABILITY)
-        lat_diff = Math().calc_max_lat_deviance(self.RADIUS_OF_VIEWABILITY, lng)
+        if SEARCHING_DISTANCE is None:
+            SEARCHING_DISTANCE = self.RADIUS_OF_VIEWABILITY
+        
+        lon_diff = Math().calc_max_lon_deviance(SEARCHING_DISTANCE)
+        lat_diff = Math().calc_max_lat_deviance(SEARCHING_DISTANCE, lng)
 
-        res = self.property._query_by_coord_range(
-            lng_above=lng+lon_diff,
-            lng_below=lng-lon_diff,
-            lat_above=lat+lat_diff,
-            lat_below=lat-lat_diff
+        res = self.property._query_by_coord_range_and_filter(
+            lng_above=float(lng)+float(3*lon_diff),
+            lng_below=float(lng)-float(3*lon_diff),
+            lat_above=float(lat)+float(lat_diff),
+            lat_below=float(lat)-float(lat_diff),
+            filters=filters
         )
 
         return res
 
+    
+    def get_location_ai_data(self):  # multi thread this to make it faster 
+
+        nearby = self.query_by_coords_and_filter(
+            self.longitude
+            self.latitude,
+            filters={"style" : self.style}
+            SEARCHING_DISTANCE=SEARCHABLE_DISTANCE
+        )
+
+        distances = [] 
+        prices = []
+        
+        # get the NUM_NEARBY_CONSIDERED_FOR_AI nearest properties and average their fitted lines
+        for i in range(len(nearby)):
+            node = nearby[i]         
+            distances[i] = Math().calc_dist_bw_coords( 
+                (self.latitude, self.longitude),
+                (node.latitude, node.longitude)
+            )
+
+            prices[i] = node.sold_price
+        
+
+        max_iterations = min(self.NUM_NEARBY_CONSIDERED_FOR_AI, len(prices))
+        
+
+        ''' create z score array of distances '''         
+        z_dists = stats.zscore(  # multi 
+            np.array(
+                # there are less nodes in the array than NUM_NEARBY_CONSIDERED_FOR_AI
+                distances[:max_iterations]
+            )
+        )
+
+        # ''' create z score array of distances '''
+        # z_prices = stats.zscore( # multi 
+        #     np.array(
+        #         # there are less nodes in the array than NUM_NEARBY_CONSIDERED_FOR_AI
+        #         prices[:max_iterations]
+        #     )
+        # )
+
+        # after 1 standard deviations the output becomse insignificant
+        z_dists = [1 * abs(z) for z in z_dists]   # score is now a variance, not absolute z_score
+        # z_prices = [1 * abs(z) for z in z_prices]  # score is now a variance, not absolute z_score
+
+
+        inverse_distance_scores_sum = 0 
+        inverse_price_scores_sum = 0 
+        
+
+        for i in range(max_iterations):
+
+            # 1/(x +0.1) normalized function using with a max of 10 using z_score
+            inverse_distance_scores_sum += 1 / (z_dists[i] + 0.1)
+            # inverse_price_scores_sum += 1 / (z_prices[i] + 0.1 )
+        
+
+                    
+        # variables for the equation a * x *x + b*x + c 
+        a = 0
+        b = 0 
+        c = 1
+
+
+        # get the NUM_NEARBY_CONSIDERED_FOR_AI nearest properties and average their fitted lines
+        for i in range(max_iterations):
+            node = nearby[i]
+            lng = node.longitude
+            lat = node.latitude
+
+            a_val = node.ai_data["a"] 
+            b_val = node.ai_data["b"]
+            
+            dist_function_val = 1 / (z_dists[i] + 0.1)
+            a += a_val * ( dist_function_val / inverse_distance_scores_sum )
+            b += b_val * ( dist_function_val / inverse_distance_scores_sum )
+
+
+        # used to find max of slope for negative if valued function
+        variances = []
+
+        stop_ind = -1
+        inverse_variance_sum = 0 
+        for i in range(max_iterations):
+
+            node = nearby[i]
+            variances.append( a * distances[i] **2  + b * distances[i] + c )
+
+            if i > 1 and a < 0 and variances[i] < variances[i-1] : # max reached
+                stop_ind = i
+                break
+            else:
+                
+                # 1/(x +0.1) normalized function using with a max of 10 using z_score
+                inverse_variance_sum += 1 / ( variances[i] + 0.1)
+
+        predicted_price = 0 
+        for i in range(stop_ind):
+            node = nearby[i]
+            price = node.sold_price
+
+            variance_function_val = 1 / ( variances[i] + 0.1)
+
+            predicted_price += price * (variance_function_val / inverse_variance_sum)
+
+            # calculate root sum squared val 
+            RSS_of_variance += ( variance[i] * (variance_function_val / inverse_variance_sum) ) ** 2
+
+
+        RSS_of_variance **= 0.5  # sqaure root squared sums
+
+        relative_error = RSS_of_variance / predicted_price
+
+
+        return {
+            "predicted_price" : predicted_price,
+            "relative_error" : relative_error
+        }    
+        
+
+
+
     def _get_adjacent_nodes(self, lng, lat):
 
-
-        res = self.query_by_coords(lng, lat) 
+        res = self.query_by_coords_and_filter(lng, lat) 
 
         _map = {}
         coords =  []
@@ -91,7 +226,7 @@ class PropertiesController:
         
         stop_ind =len(dists)
         for i in range(len(dists)):
-            if dists[i][0] > self.SEARCHABLE_DISTACNE:  # grab nodes within 1 km 
+            if dists[i][0] > self.SEARCHABLE_DISTANCE:  # grab nodes within 1 km 
                 stop_ind = i
                 break 
 

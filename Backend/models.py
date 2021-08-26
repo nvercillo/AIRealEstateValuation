@@ -36,11 +36,11 @@ class Property(db.Model):
     def __init__(self, address=None, sold_price=None, soldOn=None,
     soldDate=None, listedOn=None, longitude=None, latitude=None, style=None, data=None, start_engine=False):
 
-        assert os.environ['DB_URI'] == "postgresql://ijnykwiczlfsrl:2b76aead17ba334800f1360d3c6f37c9f128be22965e08bc23445aa0a9f5cfbc@ec2-54-160-96-70.compute-1.amazonaws.com:5432/d85hoc3itaj780", \
-            print("GOT ", os.environ['DB_URI'])
+        assert os.environ['DB_URI'] is not None, \
+            print("INVALID DB_URI")
 
         engine = create_engine(
-            os.environ["DB_URI"], 
+            os.environ["PRODUCTION_DB_URI"], 
             echo=not (os.environ['PRODUCTION'] and os.environ['PRODUCTION'] == "True"))
         Session = sessionmaker(bind=engine)
         self.session = Session()
@@ -64,13 +64,25 @@ class Property(db.Model):
 
 
     ''' Function gets all nodes within a range of two long and lats '''
-    def _query_by_coord_range(self, lng_above, lng_below, lat_above, lat_below):
-        res = self.session.query(Property).filter(
-            Property.latitude > lat_below,
-            Property.latitude < lat_above,
-            Property.longitude < lng_above,
-            Property.latitude > lng_below
-        ).all()
+    def _query_by_coord_range_and_filter(self, lng_above, lng_below, lat_above, lat_below, filters=False):
+
+        if not filters:
+            res = self.session.query(Property).filter(
+                Property.latitude > lat_below,
+                Property.latitude < lat_above,
+                Property.longitude < lng_above,
+                Property.longitude > lng_below
+            ).all()
+
+        else:
+            res = self.session.query(Property).filter(
+                Property.latitude > lat_below,
+                Property.latitude < lat_above,
+                Property.longitude < lng_above,
+                Property.longitude > lng_below,
+                Property.style == filters['style']
+            ).all()
+
         return res
 
     def _query_by_id(self, id):
@@ -101,10 +113,10 @@ class Property(db.Model):
             "lat" : float(self.latitude)
         }
     def __repr__(self):
-        return f'<address {self.address}, id {self.id}>'
+        return f'< id {self.id}, price {self.sold_price}, style {self.style} >'
 
     def __str__(self):
-        return f'<address {self.address}, id {self.id}, lng {self.longitude}, lat {self. latitude}>'
+        return f'< id {self.id}, price {self.sold_price}, style {self.style} >'
 
 
 
