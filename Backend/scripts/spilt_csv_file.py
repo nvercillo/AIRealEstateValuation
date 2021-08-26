@@ -1,6 +1,6 @@
-''' THIS FILE WAS IMPORTED BY kelvintaywl ON GITHUB
+""" THIS FILE WAS IMPORTED BY kelvintaywl ON GITHUB
 SEE GIST AT https://gist.github.com/kelvintaywl/37dbfaea789707ec5f48
-'''
+"""
 
 import csv
 import sys
@@ -31,14 +31,14 @@ with open(filename) as infile:
     start_index = 0
     # here, we slice the total rows into pages, each page having [row_per_csv] rows
     while start_index < row_count:
-        pages.append(rows[start_index: start_index+rows_per_csv])
+        pages.append(rows[start_index : start_index + rows_per_csv])
         start_index += rows_per_csv
 
     for i, page in enumerate(pages):
-        with open('{}_{}.csv'.format(file_name, i+1), 'w+') as outfile:
+        with open("{}_{}.csv".format(file_name, i + 1), "w+") as outfile:
             writer = csv.DictWriter(outfile, fieldnames=header)
             writer.writeheader()
             for row in page:
                 writer.writerow(row)
 
-        print('DONE splitting {} into {} files'.format(filename, len(pages)))
+        print("DONE splitting {} into {} files".format(filename, len(pages)))

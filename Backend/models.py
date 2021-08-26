@@ -1,14 +1,9 @@
-import os 
+import os
 import uuid
-import psycopg2
-from flask import Flask, jsonify
-from flask_script import Manager
-from flask_migrate import Migrate, MigrateCommand
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.dialects.postgresql import JSON
 from sqlalchemy import Column, Integer, String, ForeignKey, create_engine
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import relationship, backref, sessionmaker, joinedload, load_only
+from sqlalchemy.orm import sessionmaker
 from sqlalchemy.dialects.postgresql import UUID
 
 # from server import db  # UNCOMMENT WHEN RUNNING MIGRATION
@@ -17,15 +12,15 @@ from sqlalchemy.dialects.postgresql import UUID
 #     print("SDFSDFS")
 # else:
 db = SQLAlchemy()
-    
+
 
 class Property(db.Model):
-    __tablename__ = 'PROPERTIES'
+    __tablename__ = "PROPERTIES"
 
     id = db.Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     address = db.Column(db.String(255), index=True)
-    longitude = db.Column(db.Numeric(9,6), index=True)
-    latitude = db.Column(db.Numeric(9,6), index=True)
+    longitude = db.Column(db.Numeric(9, 6), index=True)
+    latitude = db.Column(db.Numeric(9, 6), index=True)
     sold_price = db.Column(db.Float)
     soldOn = db.Column(db.DateTime)
     soldDate = db.Column(db.DateTime)
@@ -33,15 +28,26 @@ class Property(db.Model):
     style = db.Column(db.String(255))
     data = db.Column(JSON)
 
-    def __init__(self, address=None, sold_price=None, soldOn=None,
-    soldDate=None, listedOn=None, longitude=None, latitude=None, style=None, data=None, start_engine=False):
+    def __init__(
+        self,
+        address=None,
+        sold_price=None,
+        soldOn=None,
+        soldDate=None,
+        listedOn=None,
+        longitude=None,
+        latitude=None,
+        style=None,
+        data=None,
+        start_engine=False,
+    ):
 
-        assert os.environ['DB_URI'] is not None, \
-            print("INVALID DB_URI")
+        assert os.environ["DB_URI"] is not None, print("INVALID DB_URI")
 
         engine = create_engine(
-            os.environ["PRODUCTION_DB_URI"], 
-            echo=not (os.environ['PRODUCTION'] and os.environ['PRODUCTION'] == "True"))
+            os.environ["PRODUCTION_DB_URI"],
+            echo=not (os.environ["PRODUCTION"] and os.environ["PRODUCTION"] == "True"),
+        )
         Session = sessionmaker(bind=engine)
         self.session = Session()
 
@@ -49,39 +55,52 @@ class Property(db.Model):
             self.address = address
             self.sold_price = sold_price
             self.soldOn = soldOn
-            self.soldDate =soldDate
+            self.soldDate = soldDate
             self.listedOn = listedOn
             self.style = style
             self.longitude = longitude
             self.latitude = latitude
             self.data = data
-            
 
     def __as_dict__(self):
-        return {key:value for key, value in 
-            self.__dict__.items() if not key.startswith('__') 
-            and not callable(key) and '_sa_instance' not in key}
+        return {
+            key: value
+            for key, value in self.__dict__.items()
+            if not key.startswith("__")
+            and not callable(key)
+            and "_sa_instance" not in key
+        }
 
+    """ Function gets all nodes within a range of two long and lats """
 
-    ''' Function gets all nodes within a range of two long and lats '''
-    def _query_by_coord_range_and_filter(self, lng_above, lng_below, lat_above, lat_below, filters=False):
+    def _query_by_coord_range_and_filter(
+        self, lng_above, lng_below, lat_above, lat_below, filters=False
+    ):
 
         if not filters:
-            res = self.session.query(Property).filter(
-                Property.latitude > lat_below,
-                Property.latitude < lat_above,
-                Property.longitude < lng_above,
-                Property.longitude > lng_below
-            ).all()
+            res = (
+                self.session.query(Property)
+                .filter(
+                    Property.latitude > lat_below,
+                    Property.latitude < lat_above,
+                    Property.longitude < lng_above,
+                    Property.longitude > lng_below,
+                )
+                .all()
+            )
 
         else:
-            res = self.session.query(Property).filter(
-                Property.latitude > lat_below,
-                Property.latitude < lat_above,
-                Property.longitude < lng_above,
-                Property.longitude > lng_below,
-                Property.style == filters['style']
-            ).all()
+            res = (
+                self.session.query(Property)
+                .filter(
+                    Property.latitude > lat_below,
+                    Property.latitude < lat_above,
+                    Property.longitude < lng_above,
+                    Property.longitude > lng_below,
+                    Property.style == filters["style"],
+                )
+                .all()
+            )
 
         return res
 
@@ -90,9 +109,7 @@ class Property(db.Model):
         return res
 
     def _query_by_ids(self, ids):
-        res = self.session.query(Property).filter(
-            Property.id.in_(ids)
-        ).all()
+        res = self.session.query(Property).filter(Property.id.in_(ids)).all()
         return res
 
     def _query_all(self):
@@ -104,20 +121,16 @@ class Property(db.Model):
             self.session.add(obj)
         session.commit()
 
-
     def __as_small_dict__(self):
         return {
-            "address" : str(self.address),
-            "id" : str(self.id),
+            "address": str(self.address),
+            "id": str(self.id),
             "lng": float(self.longitude),
-            "lat" : float(self.latitude)
+            "lat": float(self.latitude),
         }
+
     def __repr__(self):
-        return f'< id {self.id}, price {self.sold_price}, style {self.style} >'
+        return f"< id {self.id}, price {self.sold_price}, style {self.style} >"
 
     def __str__(self):
-        return f'< id {self.id}, price {self.sold_price}, style {self.style} >'
-
-
-
-
+        return f"< id {self.id}, price {self.sold_price}, style {self.style} >"
