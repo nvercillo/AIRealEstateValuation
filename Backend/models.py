@@ -116,10 +116,10 @@ class Property(db.Model):
         res = self.session.query(Property).all()
         return res
 
-    def _insert(bulk_list):
+    def _insert(self, bulk_list):
         for obj in bulk_list:
             self.session.add(obj)
-        session.commit()
+        self.session.commit()
 
     def __as_small_dict__(self):
         return {

@@ -2,7 +2,7 @@ import json
 import sys
 
 sys.path.insert(0, "..")  # import parent folder
-from models import Property
+from models import Property, Images
 import numpy as np
 from scipy.spatial import distance
 from scipy.stats import zscore
@@ -23,9 +23,14 @@ class PropertiesController:
 
     def __init__(self):
         self.property = Property(start_engine=True)
+        self.images = Images(start_engine=True)
 
-    def _get_by_id(self, id):
-        return self.property._query_by_id(id)
+    def _get_by_id(self, _id):
+        return self.property._query_by_id(
+            _id
+        ).update(
+            { "images" : self.images._query_by_id_mock(_id) }
+        )
 
     def query_by_coords_and_filter(
         self, lng, lat, filters=False, SEARCHING_DISTANCE=None

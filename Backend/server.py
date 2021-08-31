@@ -139,6 +139,25 @@ def get_amenities_from_id():
     return response
 
 
+@app.route("/api/get_cities_and_sample_addresses", methods=["GET"])
+@cross_origin(supports_credentials=True)
+@require_appkey
+def get_list_of_serviced_cities():
+
+    locations = {
+        "toronto": ["67 Bond Street", "100 King Street", "100 University Ave West"],
+        "calgary": ["340 8 Ave SW", "100 7 Ave SW", "312 12 Ave SW"],
+    }
+
+    response = app.response_class(
+        response=json.dumps(locations, cls=AlchemyEncoder),
+        status=200,
+        mimetype="application/json",
+    )
+
+    return response
+
+
 @app.route("/api/enumerations", methods=["GET"])
 @cross_origin(supports_credentials=True)
 @require_appkey
