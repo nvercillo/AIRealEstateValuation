@@ -1,3 +1,8 @@
+"""
+Description: create enumerations from text file (deprecated)
+
+"""
+
 filepath = "enums_to_create_example.txt"
 
 arr = []

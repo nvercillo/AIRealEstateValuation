@@ -1,3 +1,9 @@
+""" 
+Description: purpose is to poll heroku frontend and backend servers (to be deprecated)
+
+"""
+
+
 import os
 import requests
 from datetime import datetime

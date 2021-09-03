@@ -4,6 +4,11 @@ from flask import Flask
 from sqlalchemy.ext.declarative import DeclarativeMeta
 from math import sin, cos, sqrt, atan2, radians, pi
 from numpy import arccos
+from sqlalchemy.dialects.postgresql import UUID
+from flask import abort, request, jsonify
+from functools import wraps
+from werkzeug.exceptions import HTTPException
+from werkzeug.exceptions import default_exceptions
 
 
 class Utils:
@@ -24,7 +29,33 @@ class Utils:
             "SQLALCHEMY_TRACK_MODIFICATIONS"
         ]
         app.config["BUNDLE_ERRORS"] = os.environ["BUNDLE_ERRORS"]
+
+        @app.errorhandler(Exception)
+        def handle_error(e):
+            code = 500
+            if isinstance(e, HTTPException):
+                code = e.code
+            return jsonify(error=str(e)), code
+
+        for ex in default_exceptions:
+            app.register_error_handler(ex, handle_error)
+
         return app
+
+    @staticmethod
+    def require_appkey(view_function):
+        # API authentication route decorator
+        @wraps(view_function)
+        def decorated_function(*args, **kwargs):
+            if (
+                request.args.get("key")
+                and request.args.get("key") == os.environ["API_KEY"]
+            ):
+                return view_function(*args, **kwargs)
+            else:
+                abort(401)
+
+        return decorated_function
 
 
 class Math:
@@ -83,6 +114,7 @@ class Math:
             else:
                 l_count += 1
         if l_mode is not None and l_count > count:
+
             count = l_count
             mode = l_mode
 
@@ -94,7 +126,47 @@ class AlchemyEncoder(json.JSONEncoder):
     alchemy queries"""
 
     def default(self, obj):
+        if isinstance(obj, UUID):
+            # if the obj is uuid, we simply return the value of uuid
+            return obj.hex
+
         if isinstance(obj.__class__, DeclarativeMeta):
+
+            if isinstance(obj, UUID):
+                # if the obj is uuid, we simply return the value of uuid
+                return obj.hex
+
+            # an SQLAlchemy class
+            fields = {}
+            for field in [
+                x for x in dir(obj) if not x.startswith("_") and x != "metadata"
+            ]:
+                data = obj.__getattribute__(field)
+                try:
+                    json.dumps(
+                        data
+                    )  # this will fail on non-encodable values, like other classes
+                    fields[field] = data
+                except TypeError:
+                    fields[field] = None
+            # a json-encodable dict
+            return fields
+
+        return json.JSONEncoder.default(self, obj)
+
+
+class UUIDEncoder(json.JSONEncoder):
+    def default(self, obj):
+        if isinstance(obj, UUID):
+            # if the obj is uuid, we simply return the value of uuid
+            return obj.hex
+
+        if isinstance(obj.__class__, DeclarativeMeta):
+
+            if isinstance(obj, UUID):
+                # if the obj is uuid, we simply return the value of uuid
+                return obj.hex
+
             # an SQLAlchemy class
             fields = {}
             for field in [

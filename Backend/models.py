@@ -1,14 +1,9 @@
 import os
 import uuid
-import psycopg2
-from flask import Flask, jsonify
-from flask_script import Manager
-from flask_migrate import Migrate, MigrateCommand
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.dialects.postgresql import JSON
 from sqlalchemy import Column, Integer, String, ForeignKey, create_engine
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import relationship, backref, sessionmaker, joinedload, load_only
+from sqlalchemy.orm import sessionmaker
 from sqlalchemy.dialects.postgresql import UUID
 
 # from server import db  # UNCOMMENT WHEN RUNNING MIGRATION
@@ -20,7 +15,8 @@ db = SQLAlchemy()
 
 
 class Property(db.Model):
-    __tablename__ = "PROPERTIES"
+
+    __tablename__ = "ai-properties-data"
 
     id = db.Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     address = db.Column(db.String(255), index=True)
@@ -47,13 +43,10 @@ class Property(db.Model):
         start_engine=False,
     ):
 
-        assert (
-            os.environ["DB_URI"]
-            == "postgresql://ijnykwiczlfsrl:2b76aead17ba334800f1360d3c6f37c9f128be22965e08bc23445aa0a9f5cfbc@ec2-54-160-96-70.compute-1.amazonaws.com:5432/d85hoc3itaj780"
-        ), print("GOT ", os.environ["DB_URI"])
+        assert os.environ["DB_URI"] is not None, print("INVALID DB_URI")
 
         engine = create_engine(
-            os.environ["DB_URI"],
+            os.environ["PRODUCTION_DB_URI"],
             echo=not (os.environ["PRODUCTION"] and os.environ["PRODUCTION"] == "True"),
         )
         Session = sessionmaker(bind=engine)
@@ -81,17 +74,35 @@ class Property(db.Model):
 
     """ Function gets all nodes within a range of two long and lats """
 
-    def _query_by_coord_range(self, lng_above, lng_below, lat_above, lat_below):
-        res = (
-            self.session.query(Property)
-            .filter(
-                Property.latitude > lat_below,
-                Property.latitude < lat_above,
-                Property.longitude < lng_above,
-                Property.latitude > lng_below,
+    def _query_by_coord_range_and_filter(
+        self, lng_above, lng_below, lat_above, lat_below, filters=False
+    ):
+
+        if not filters:
+            res = (
+                self.session.query(Property)
+                .filter(
+                    Property.latitude > lat_below,
+                    Property.latitude < lat_above,
+                    Property.longitude < lng_above,
+                    Property.longitude > lng_below,
+                )
+                .all()
             )
-            .all()
-        )
+
+        else:
+            res = (
+                self.session.query(Property)
+                .filter(
+                    Property.latitude > lat_below,
+                    Property.latitude < lat_above,
+                    Property.longitude < lng_above,
+                    Property.longitude > lng_below,
+                    Property.style == filters["style"],
+                )
+                .all()
+            )
+
         return res
 
     def _query_by_id(self, id):
@@ -106,10 +117,10 @@ class Property(db.Model):
         res = self.session.query(Property).all()
         return res
 
-    def _insert(bulk_list):
+    def _insert(self, bulk_list):
         for obj in bulk_list:
             self.session.add(obj)
-        session.commit()
+        self.session.commit()
 
     def __as_small_dict__(self):
         return {
@@ -120,7 +131,7 @@ class Property(db.Model):
         }
 
     def __repr__(self):
-        return f"<address {self.address}, id {self.id}>"
+        return f"< id {self.id}, price {self.sold_price}, style {self.style} >"
 
     def __str__(self):
-        return f"<address {self.address}, id {self.id}, lng {self.longitude}, lat {self. latitude}>"
+        return f"< id {self.id}, price {self.sold_price}, style {self.style} >"

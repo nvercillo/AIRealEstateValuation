@@ -1,3 +1,7 @@
+""" 
+Description: creates a unique api key 
+"""
+
 import os
 from binascii import hexlify
 

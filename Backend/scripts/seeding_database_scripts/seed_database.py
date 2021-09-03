@@ -1,3 +1,7 @@
+""" 
+Description: seed database with data currently cached in files and geoencode amenity information
+
+"""
 import sys
 
 sys.path.insert(0, "..")  # import parent folder
@@ -54,7 +58,7 @@ class SeedDatabase:
 
     def seed_db_and_geoencode_amenities_for_csv_file(self, csv_ind, log_mutex):
 
-        with open(f"../../Data/data_{csv_ind}.csv") as f:
+        with open(f"../../../Data/data_{csv_ind}.csv") as f:
 
             count = 0
             to_insert = []

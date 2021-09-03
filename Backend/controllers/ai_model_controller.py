@@ -17,6 +17,9 @@ class AIModelController:
     def __init__(self):
         pass
 
+    def dummy_predict_price(self, *args):
+        return format(random.randint(700000, 2000000), ",")
+
     # # Input columns titles
     # """[
     #     "squarefootage",
@@ -431,6 +434,3 @@ class AIModelController:
 
         print("Housing Price Prediction  - ${}".format(y_0))
         return y_0
-
-    def dummy_predict_price(self, *args):
-        return format(random.randint(700000, 2000000), ",")

@@ -1,3 +1,9 @@
+""" 
+Description: read data text files and concatenate them into a csv file
+
+"""
+
+
 import json
 import csv
 
@@ -9,7 +15,7 @@ col_names = []
 first = True
 for i in range(1, 450):
     try:
-        with open(f"../../Data/data{i}.txt", "r", encoding="utf8") as f:
+        with open(f"../../../Data/data{i}.txt", "r", encoding="utf8") as f:
             flines = f.readlines()
             for line in flines:
                 lines += line
@@ -19,7 +25,7 @@ for i in range(1, 450):
                 col_names = [k for k in data]
 
         if len(rows) > 150:
-            with open("../../Data/data.csv", "a+", newline="") as csv_f:
+            with open("../../../Data/data.csv", "a+", newline="") as csv_f:
                 writer = csv.writer(csv_f)
                 if first:
                     writer.writerows([col_names])
@@ -31,7 +37,7 @@ for i in range(1, 450):
         print(f"page {i} failed")
 
 
-with open("../../Data/data.csv", "a+", newline="") as csv_f:
+with open("../../../Data/data.csv", "a+", newline="") as csv_f:
     writer = csv.writer(csv_f)
     if first:
         writer.writerows(col_names)
