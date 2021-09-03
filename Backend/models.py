@@ -6,11 +6,7 @@ from sqlalchemy import Column, Integer, String, ForeignKey, create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.dialects.postgresql import UUID
 
-# from server import db  # UNCOMMENT WHEN RUNNING MIGRATION
-# if __name__ =="__main__":
-# from server import db
-#     print("SDFSDFS")
-# else:
+
 db = SQLAlchemy()
 
 
@@ -123,6 +119,7 @@ class Property(db.Model):
         self.session.commit()
 
     def __as_small_dict__(self):
+
         return {
             "address": str(self.address),
             "id": str(self.id),
