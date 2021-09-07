@@ -46,7 +46,7 @@ pip install black
 USE BLACK FORMATTER TO AVOID MERGE CONFLICTS AND IMPROVE CODE QUALITY
 
 * On Linux: 
-
+```
 cd backend 
 python -m venv env (optional)
 source env/bin/activate (optional)
@@ -69,12 +69,13 @@ ONE TIME ONLY:
 python create_api_key.py (optional, creates api key and adds it to env file. This should be copied in frontend)
 
 python server.py 
-
+```
 
 
 ### Testing 
 Requirements: pytest 
+```
 cd backend;
 pytest (outside of venv)
-
+```
 
