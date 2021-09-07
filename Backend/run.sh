@@ -1,2 +1,2 @@
 pipenv install
-pipenv run python server.py
+pipenv run python3 server.py
