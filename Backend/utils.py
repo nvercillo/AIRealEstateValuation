@@ -114,7 +114,6 @@ class Math:
             else:
                 l_count += 1
         if l_mode is not None and l_count > count:
-
             count = l_count
             mode = l_mode
 

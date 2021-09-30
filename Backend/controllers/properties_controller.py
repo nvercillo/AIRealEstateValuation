@@ -47,6 +47,25 @@ class PropertiesController:
 
         return res
 
+    # DUMMY FUNCTION
+    #TODO: Implement w DB images
+    def get_images_ids_for_property(self, property_id):        
+
+        ids = [
+            "9da2d40b-154d-4047-af36-40f9cb9ab25e",
+            "29fc303b-c363-44f5-8037-0ae099132425",
+            "30fd1fa5-1829-4646-848d-29f936ebbc40",
+            "55c6b38c-ff1d-4ae1-b2b5-1e62fb870f16",
+            "373a3884-3a53-41bb-a729-cf2f39f6849e",
+            "9488a9d0-609b-4157-adc4-3b3c2f888949",
+            "abd00cc4-5e7b-4c67-b91f-d67bba1ec0f1",
+            "ae388806-f6ba-43c7-9930-f1a7120dfe0d",
+            "bbe0ad77-02e1-4b34-bea5-c1b776c8b5ef",
+            "ffa7e520-d11c-4bac-9ff9-75b1c208061b"
+        ]
+        return ids
+    
+
     """ FUNCTION DESCRIPTION: 
         @breif: returns the predicted price and the relative error on this prediction
         @description: 
@@ -255,3 +274,8 @@ class PropertiesController:
 
         for ind in reversed([g for g in in_group]):
             sorted_arr.pop(ind)
+
+
+# res = PropertiesController()._get_by_id("eec7984d-e86e-441e-a0b7-4474cb7ff97d")
+
+# print(res)

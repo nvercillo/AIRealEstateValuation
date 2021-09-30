@@ -58,7 +58,7 @@ def test_amenities(environment, authenticated):
         if authenticated:
             URL += f"?key={os.environ['API_KEY']}"
             res = requests.get(
-                url=URL, params={"id": "00159f42-8e6d-4c85-ad17-28942a8dd700"}
+                url=URL, params={"id": "eec7984d-e86e-441e-a0b7-4474cb7ff97d"}
             )
             print(".")
             print(".")
@@ -174,4 +174,35 @@ def test_adjacent_nodes_endpoint(environment, authenticated):
     except Exception as e:
         raise Exception(
             f"TEST test_home_endpoint FAILED RUN: environment {environment}, authenticated {authenticated}, exception: {e}"
+        )
+
+
+@pytest.mark.parametrize(
+    "environment",
+    [
+        # "localhost", "production"
+        "localhost"
+    ],
+)
+@pytest.mark.parametrize("authenticated", [True])
+def test_image_ids_endpoint(environment, authenticated):
+
+    URL = LOCAL_URL if environment == "localhost" else PROD_URL
+    URL += "/api/property_images"
+
+    try:
+        if authenticated:
+            URL += f"?key={os.environ['API_KEY']}"
+            res = requests.get(
+                url=URL, params={"property_id": "eec7984d-e86e-441e-a0b7-4474cb7ff97d"}
+            )
+            print(res.text)
+            assert res.status_code == 200
+        else:
+            res = requests.get(url=URL)
+            assert res.status_code == 401
+
+    except Exception as e:
+        raise Exception(
+            f"FAILED RUN: environment {environment}, authenticated {authenticated}, exception: {e}"
         )

@@ -38,13 +38,11 @@ for p in all_props:
         SEARCHING_DISTANCE=SEARCHING_DISTANCE,
     )
 
-    # print(nearby, len(nearby))
-
     dists = []
     price_deviation = []
     for n in nearby:
-        # if p.id == n.id:
-        #     continue
+        if p.id == n.id:
+            continue
 
         dist_to_node = Math().calc_dist_bw_coords(
             (p.latitude, p.longitude), (n.latitude, n.longitude)

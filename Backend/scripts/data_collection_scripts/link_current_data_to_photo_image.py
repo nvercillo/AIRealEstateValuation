@@ -5,12 +5,14 @@ Description: read photo information files describing the link and id of properti
 
 import sys
 
-sys.path.insert(0, "..")  # import parent folder
+sys.path.insert(0, "../../")  # import parent folder
 import os
 import requests
 import json
+import uuid
 import urllib
 import csv
+import pathlib
 from models import Property
 from utils import AlchemyEncoder
 from flask_sqlalchemy import SQLAlchemy
@@ -19,13 +21,17 @@ from PIL import Image
 from uuid import UUID
 
 
+print("Querying all properties ... ")
+
 os.chdir("../../../Data/Images")
 property_model = Property()
 properties = property_model._query_all()
 
+print("GOT ALL DATA")
+
 
 def dump_images(page_start, page_end, thread_num):
-
+    arr = []
     for i in range(page_start, page_end):
 
         prop = properties[i]
@@ -38,10 +44,16 @@ def dump_images(page_start, page_end, thread_num):
 
         data["id"] = str(data["id"])
 
-        f = open(
-            f"../../../../Data/Images/photo_info_{thread_num}_number_{i}.json", "w+"
-        )
-        f.write(json.dumps(data))
+        arr.append(data)
+
+    parent_dir = str(pathlib.Path(__file__).parent.resolve())
+    file_suffix = f"/photo_info_{thread_num}"
+
+    dir_path = parent_dir + file_suffix
+    os.mkdir(dir_path)
+
+    f = open(f"{dir_path}/{file_suffix}.json", "w+")
+    f.write(json.dumps(arr))
 
 
 N = 25  # number of image ripping threads

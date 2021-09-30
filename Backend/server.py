@@ -8,14 +8,15 @@ from utils import Utils, AlchemyEncoder
 from dotenv import load_dotenv
 from os.path import join, dirname
 from waitress import serve
-from flask import request
+from flask import request, send_file
 
+load_dotenv(join(dirname(__file__), ".env"))
 
 load_dotenv(join(dirname(__file__), ".env"))
 
 app = Utils.get_app_with_db_configured()
 
-from models import Property  # this line needs to be after app assignment
+from models import db  # this line needs to be after app assignment
 
 from controllers import enumerations_controller
 from controllers import properties_controller
@@ -92,6 +93,39 @@ def get_amenities_from_id():
 
     return response
 
+@app.route("/api/property_images", methods=["GET"])
+@cross_origin(supports_credentials=True)
+@Utils.require_appkey
+def get_image_ids_for_property():
+
+    property_id = request.args.get("property_id")
+    ids = PropertiesController().get_images_ids_for_property(property_id)
+
+    response = app.response_class(
+        response=json.dumps(ids, cls=AlchemyEncoder),
+        status=200,
+        mimetype="application/json",
+    )
+
+    return response
+
+# DUMMY FUNCTION
+#TODO: Implement w DB images
+@app.route("/api/property_images/<image_id>", methods=["GET"])
+@cross_origin(supports_credentials=True)
+# @Utils.require_appkey
+def get_property_image_from_id(image_id):
+    file_name = f"controllers/00a19999-705b-4c65-a1fb-6aafbfcac363/{image_id}.png"
+    with open(file_name, "rb") as f:
+        image_binary = f.read()
+        response = app.response_class(
+            response=image_binary,
+            status=200,
+            mimetype="application/json",
+        )
+
+        return response
+
 
 @app.route("/api/enumerations", methods=["GET"])
 @cross_origin(supports_credentials=True)
@@ -124,10 +158,13 @@ def get_list_of_serviced_cities():
     return response
 
 
+db.init_app(app)
 if __name__ == "__main__":
     if os.environ["PRODUCTION"] and os.environ["PRODUCTION"] == "True":
-        print("Started production server .... :)")
+        print("\nStarted production server .... :)\n")
+        print("APP URL: https://localhost:5000\n")
         print(f"Production DB URI: {os.environ['DB_URI']}")
-        serve(app, host="0.0.0.0", port=5000)  # run production server
+        app.run(debug=True)  # run default flask server
+        # serve(app, host="0.0.0.0", port=5000)  # run production server
     else:
         app.run(debug=True)  # run default flask server

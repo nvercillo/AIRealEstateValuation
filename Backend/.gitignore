@@ -1,7 +1,6 @@
 node_modules
 
 
-/tests
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
@@ -30,7 +29,7 @@ share/python-wheels/
 .installed.cfg
 *.egg
 MANIFEST
-
+logfile.txt
 
 .Data/
 .Pipfile.lock

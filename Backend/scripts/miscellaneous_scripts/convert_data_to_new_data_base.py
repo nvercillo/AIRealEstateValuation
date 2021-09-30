@@ -13,7 +13,7 @@ import requests
 import json
 import urllib
 import csv
-from models import Property, PropertyData
+from models import Property
 from flask_sqlalchemy import SQLAlchemy
 from server import db
 from sqlalchemy.dialects.postgresql import insert

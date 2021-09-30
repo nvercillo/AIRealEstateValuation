@@ -1,3 +1,5 @@
+# DEPRECATED ...
+
 """
 Description: scrape images from a list of urls
 
@@ -19,18 +21,19 @@ try:
     f = open("../../../Data/Images/page_ranges.txt", "r")
 except:
     print("Running get_max_page_range.js script")
-    success = execute_js(f"../../PuppeteerWebScrapper/get_max_page_range.js")
+
+    success = execute_js(f"puppeteer_scraping/get_max_page_range.js")
     f = open("../../../Data/Images/page_ranges.txt", "r")
 
 
 num_pages = int(f.read())
 
+print(num_pages)
+
 
 def scrape_images(page_start, page_end):
     print(f"Running script {page_start} {page_end}")
-    success = execute_js(
-        f"../../PuppeteerWebScrapper/scrape_images.js {page_start} {page_end}"
-    )
+    success = execute_js(f"puppeteer_scraping/scrape_images.js {page_start} {page_end}")
 
 
 N = 25  # number of image ripping threads

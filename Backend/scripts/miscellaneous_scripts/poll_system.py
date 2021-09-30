@@ -15,10 +15,15 @@ load_dotenv(join(dirname(__file__), "../.env"))
 now = datetime.now()
 current_time = now.strftime("%H:%M:%S")
 
-res = requests.get(
+res1 = requests.get(
     f"https://ai-backend-flask.herokuapp.com/api/enumerations?key={os.environ['API_KEY']}"
 )
-
+res2 = requests.get(f"https://ai-real-estate-valuator.herokuapp.com/")
+print(res1)
+print(res2)
+print(
+    f"https://ai-backend-flask.herokuapp.com/api/enumerations?key={os.environ['API_KEY']}"
+)
 
 line_count = 0
 try:
@@ -35,13 +40,24 @@ try:
 except:
     pass
 
-f = open("logfile.txt", "a+")
-if res.status_code != 200:
+file = open("logfile.txt", "w+")
+line_count = 0
+for line in file:
+    if line != "\n":
+        line_count += 1
+file.close()
+
+if line_count < 10:
+    f = open("logfile.txt", "a+")
+else:
+    f = open("logfile.txt", "w")
+
+
+if res1.status_code != 200 or res2.status_code != 200:
     print("RUN FAILED")
     f.write(f"Time failed: {current_time}")
 else:
     print("RUN PASSED")
-    f = open("logfile.txt", "a+")
     f.write(f"Time passed: {current_time}\n")
 
 f.close()
