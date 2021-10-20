@@ -47,25 +47,6 @@ class PropertiesController:
 
         return res
 
-    # DUMMY FUNCTION
-    #TODO: Implement w DB images
-    def get_images_ids_for_property(self, property_id):        
-
-        ids = [
-            "9da2d40b-154d-4047-af36-40f9cb9ab25e",
-            "29fc303b-c363-44f5-8037-0ae099132425",
-            "30fd1fa5-1829-4646-848d-29f936ebbc40",
-            "55c6b38c-ff1d-4ae1-b2b5-1e62fb870f16",
-            "373a3884-3a53-41bb-a729-cf2f39f6849e",
-            "9488a9d0-609b-4157-adc4-3b3c2f888949",
-            "abd00cc4-5e7b-4c67-b91f-d67bba1ec0f1",
-            "ae388806-f6ba-43c7-9930-f1a7120dfe0d",
-            "bbe0ad77-02e1-4b34-bea5-c1b776c8b5ef",
-            "ffa7e520-d11c-4bac-9ff9-75b1c208061b"
-        ]
-        return ids
-    
-
     """ FUNCTION DESCRIPTION: 
         @breif: returns the predicted price and the relative error on this prediction
         @description: 
@@ -82,7 +63,6 @@ class PropertiesController:
                     to multiply by each price and the errors to find predictied price 
                     and the relative error on the predicted value
     """
-
     def get_location_ai_data(self):  # multi thread this to make it faster
 
         nearby = self.query_by_coords_and_filter(
@@ -122,7 +102,6 @@ class PropertiesController:
         inverse_distance_scores_sum = 0
 
         for i in range(max_iterations):
-
             # 1/(x +0.1) normalized function using with a max of 10 using z_score
             inverse_distance_scores_sum += 1 / (z_dists[i] + 0.1)
 
@@ -176,8 +155,9 @@ class PropertiesController:
 
         RSS_of_variance **= 0.5  # sqaure root squared sums
         relative_error = RSS_of_variance / predicted_price
-
+    
         return {"predicted_price": predicted_price, "relative_error": relative_error}
+
 
     def _get_adjacent_nodes(self, lng, lat):
 
@@ -241,13 +221,13 @@ class PropertiesController:
         arr = sorted(arr, key=lambda x: x[0])  # sort all nodes by long
 
         # dedensify node clusters
-        self.filter_for_relevant_nodes(
+        self._filter_for_relevant_nodes(
             sorted_arr=arr, critical_distance=self.CLOSEST_VIEWABLE_DISTANCE_DIFF
         )
 
         return arr
 
-    def filter_for_relevant_nodes(self, sorted_arr, critical_distance):
+    def _filter_for_relevant_nodes(self, sorted_arr, critical_distance):
         """FUNCTION:   dedensify node clusters so frontend only rendering nodes with a certain
         amount of space between them"""
 

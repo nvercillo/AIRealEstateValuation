@@ -8,9 +8,7 @@ from utils import Utils, AlchemyEncoder
 from dotenv import load_dotenv
 from os.path import join, dirname
 from waitress import serve
-from flask import request, send_file
-
-load_dotenv(join(dirname(__file__), ".env"))
+from flask import request, abort
 
 load_dotenv(join(dirname(__file__), ".env"))
 
@@ -21,18 +19,20 @@ from models import db  # this line needs to be after app assignment
 from controllers import enumerations_controller
 from controllers import properties_controller
 from controllers import ai_model_controller
+from controllers import image_controller
 
 EnumerationsController = enumerations_controller.EnumerationsController
 PropertiesController = properties_controller.PropertiesController
 AIModelController = ai_model_controller.AIModelController
+ImageController = image_controller.ImageController
 
 """ ROUTES """
-
 
 @app.route("/")
 @cross_origin(supports_credentials=True)
 @Utils.require_appkey
 def welcome_text():
+    # if not (request.args.get("key") and request.args.get("key") == os.environ["API_KEY"]): abort(401)
     return "This is an authenticated server :)"
 
 
@@ -93,13 +93,17 @@ def get_amenities_from_id():
 
     return response
 
-@app.route("/api/property_images", methods=["GET"])
+
+@app.route("/api/property_images_ids", methods=["GET"])
 @cross_origin(supports_credentials=True)
 @Utils.require_appkey
 def get_image_ids_for_property():
 
     property_id = request.args.get("property_id")
-    ids = PropertiesController().get_images_ids_for_property(property_id)
+    ids = ImageController().get_images_ids_for_property(property_id)
+
+    if len(ids) == 0:  # no images for property
+        ids = [ImageController.INVALID_IMAGE_ID]
 
     response = app.response_class(
         response=json.dumps(ids, cls=AlchemyEncoder),
@@ -109,22 +113,23 @@ def get_image_ids_for_property():
 
     return response
 
-# DUMMY FUNCTION
-#TODO: Implement w DB images
-@app.route("/api/property_images/<image_id>", methods=["GET"])
-@cross_origin(supports_credentials=True)
-# @Utils.require_appkey
-def get_property_image_from_id(image_id):
-    file_name = f"controllers/00a19999-705b-4c65-a1fb-6aafbfcac363/{image_id}.png"
-    with open(file_name, "rb") as f:
-        image_binary = f.read()
-        response = app.response_class(
-            response=image_binary,
-            status=200,
-            mimetype="application/json",
-        )
 
-        return response
+# TODO: Implement w DB images
+@app.route("/api/property_images", methods=["GET"])
+@cross_origin(supports_credentials=True)
+@Utils.require_appkey 
+def get_property_image_from_id():
+    
+    image_id = request.args.get("image_id")
+    raw_image_binary = ImageController().get_image_by_id(image_id)
+    
+    response = app.response_class(
+        response=raw_image_binary,
+        status=200,
+        mimetype="application/json",
+    )
+
+    return response
 
 
 @app.route("/api/enumerations", methods=["GET"])
@@ -159,6 +164,7 @@ def get_list_of_serviced_cities():
 
 
 db.init_app(app)
+
 if __name__ == "__main__":
     if os.environ["PRODUCTION"] and os.environ["PRODUCTION"] == "True":
         print("\nStarted production server .... :)\n")

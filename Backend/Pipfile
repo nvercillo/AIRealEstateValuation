@@ -41,6 +41,7 @@ mysqlclient = "*"
 matplotlib = "*"
 pytest = "*"
 naked = "*"
+flask-sqlalchemy = "*"
 
 [dev-packages]
 

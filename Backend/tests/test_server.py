@@ -4,6 +4,7 @@ import requests
 import os
 from dotenv import load_dotenv
 from os.path import join, dirname
+from pprint import pprint
 
 load_dotenv(join(dirname(__file__), "../.env"))
 
@@ -20,16 +21,16 @@ PROD_URL = "https://ai-backend-flask.herokuapp.com"
         "localhost"
     ],
 )
-@pytest.mark.parametrize("authenticated", [True, False])
+@pytest.mark.parametrize("authenticated", [True, True])
 def test_home_endpoint(environment, authenticated):
 
     URL = LOCAL_URL if environment == "localhost" else PROD_URL
-    URL += "/"
+
 
     try:
         if authenticated:
-            URL += f"?key={os.environ['API_KEY']}"
-            res = requests.get(url=URL)
+            # URL += f"?key={os.environ['API_KEY']}"
+            res = requests.get(url=URL, params={"key": os.environ['API_KEY']})
             assert res.status_code == 200
         else:
             res = requests.get(url=URL)
@@ -60,18 +61,18 @@ def test_amenities(environment, authenticated):
             res = requests.get(
                 url=URL, params={"id": "eec7984d-e86e-441e-a0b7-4474cb7ff97d"}
             )
-            print(".")
-            print(".")
-            print(res.text)
-            print(".")
-            print(".")
+            pprint(".")
+            pprint(".")
+            pprint(res.text)
+            pprint(".")
+            pprint(".")
             assert res.status_code == 200
         else:
             res = requests.get(url=URL)
 
             assert res.status_code == 401
 
-        print(
+        pprint(
             f"PASSED test_amenities: environment {environment}, authenticated {authenticated}"
         )
     except Exception as e:
@@ -97,11 +98,11 @@ def test_enumerations_endpoint(environment, authenticated):
         if authenticated:
             URL += f"?key={os.environ['API_KEY']}"
             res = requests.get(url=URL)
-            print(".")
-            print(".")
-            print(res.text)
-            print(".")
-            print(".")
+            pprint(".")
+            pprint(".")
+            pprint(res.text)
+            pprint(".")
+            pprint(".")
             assert res.status_code == 200
             data = json.loads(res.text)
             assert isinstance(data, dict)
@@ -110,7 +111,7 @@ def test_enumerations_endpoint(environment, authenticated):
             res = requests.get(url=URL)
             assert res.status_code == 401
 
-        print(
+        pprint(
             f"PASSED test_home_endpoint: environment {environment}, authenticated {authenticated}"
         )
     except Exception as e:
@@ -135,7 +136,7 @@ def test_adjacent_nodes_endpoint(environment, authenticated):
     try:
         if authenticated:
             URL += f"?key={os.environ['API_KEY']}"
-            print(URL)
+            pprint(URL)
             res = requests.post(
                 url=URL,
                 data=json.dumps(
@@ -152,11 +153,11 @@ def test_adjacent_nodes_endpoint(environment, authenticated):
                     }
                 ),
             )
-            print(".")
-            print(".")
-            print(res.text)
-            print(".")
-            print(".")
+            pprint(".")
+            pprint(".")
+            pprint(res.text)
+            pprint(".")
+            pprint(".")
             assert res.status_code == 200
             data = json.loads(res.text)
 
@@ -187,6 +188,41 @@ def test_adjacent_nodes_endpoint(environment, authenticated):
 @pytest.mark.parametrize("authenticated", [True])
 def test_image_ids_endpoint(environment, authenticated):
 
+
+    URL = LOCAL_URL if environment == "localhost" else PROD_URL
+    URL += "/api/property_images_ids"
+
+    try:
+        if authenticated:
+            URL += f"?key={os.environ['API_KEY']}"
+            res = requests.get(
+                url=URL, params={"property_id": "5f70921b-6b76-4f54-9664-43372e570a3b"}
+            )
+            res = requests.get(
+                url=URL, params={"property_id": "--this-property-id-doesnt-exist "}
+            )
+            pprint(res.text)
+            assert res.status_code == 200
+        else:
+            res = requests.get(url=URL)
+            assert res.status_code == 401
+
+    except Exception as e:
+        raise Exception(
+            f"FAILED RUN: environment {environment}, authenticated {authenticated}, exception: {e}"
+        )
+
+@pytest.mark.parametrize(
+    "environment",
+    [
+        # "localhost", "production"
+        "localhost"
+    ],
+)
+@pytest.mark.parametrize("authenticated", [True])
+def test_image_endpoint(environment, authenticated):
+
+
     URL = LOCAL_URL if environment == "localhost" else PROD_URL
     URL += "/api/property_images"
 
@@ -194,14 +230,18 @@ def test_image_ids_endpoint(environment, authenticated):
         if authenticated:
             URL += f"?key={os.environ['API_KEY']}"
             res = requests.get(
-                url=URL, params={"property_id": "eec7984d-e86e-441e-a0b7-4474cb7ff97d"}
+                url=URL, params={"image_id": "---invalid---"}
             )
-            print(res.text)
+            res = requests.get(
+                url=URL, params={"image_id": "02a17044-b120-4723-88d8-d98b41908dcc"}
+            )
             assert res.status_code == 200
+            print(res.text)
         else:
             res = requests.get(url=URL)
             assert res.status_code == 401
 
+        
     except Exception as e:
         raise Exception(
             f"FAILED RUN: environment {environment}, authenticated {authenticated}, exception: {e}"

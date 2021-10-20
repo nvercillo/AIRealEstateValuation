@@ -47,6 +47,7 @@ class Utils:
         # API authentication route decorator
         @wraps(view_function)
         def decorated_function(*args, **kwargs):
+            print
             if (
                 request.args.get("key")
                 and request.args.get("key") == os.environ["API_KEY"]
