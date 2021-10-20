@@ -28,6 +28,7 @@ ImageController = image_controller.ImageController
 
 """ ROUTES """
 
+
 @app.route("/")
 @cross_origin(supports_credentials=True)
 @Utils.require_appkey
@@ -117,12 +118,12 @@ def get_image_ids_for_property():
 # TODO: Implement w DB images
 @app.route("/api/property_images", methods=["GET"])
 @cross_origin(supports_credentials=True)
-@Utils.require_appkey 
+@Utils.require_appkey
 def get_property_image_from_id():
-    
+
     image_id = request.args.get("image_id")
     raw_image_binary = ImageController().get_image_by_id(image_id)
-    
+
     response = app.response_class(
         response=raw_image_binary,
         status=200,

@@ -63,6 +63,7 @@ class PropertiesController:
                     to multiply by each price and the errors to find predictied price 
                     and the relative error on the predicted value
     """
+
     def get_location_ai_data(self):  # multi thread this to make it faster
 
         nearby = self.query_by_coords_and_filter(
@@ -155,9 +156,8 @@ class PropertiesController:
 
         RSS_of_variance **= 0.5  # sqaure root squared sums
         relative_error = RSS_of_variance / predicted_price
-    
-        return {"predicted_price": predicted_price, "relative_error": relative_error}
 
+        return {"predicted_price": predicted_price, "relative_error": relative_error}
 
     def _get_adjacent_nodes(self, lng, lat):
 

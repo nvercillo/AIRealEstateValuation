@@ -26,11 +26,10 @@ def test_home_endpoint(environment, authenticated):
 
     URL = LOCAL_URL if environment == "localhost" else PROD_URL
 
-
     try:
         if authenticated:
             # URL += f"?key={os.environ['API_KEY']}"
-            res = requests.get(url=URL, params={"key": os.environ['API_KEY']})
+            res = requests.get(url=URL, params={"key": os.environ["API_KEY"]})
             assert res.status_code == 200
         else:
             res = requests.get(url=URL)
@@ -188,7 +187,6 @@ def test_adjacent_nodes_endpoint(environment, authenticated):
 @pytest.mark.parametrize("authenticated", [True])
 def test_image_ids_endpoint(environment, authenticated):
 
-
     URL = LOCAL_URL if environment == "localhost" else PROD_URL
     URL += "/api/property_images_ids"
 
@@ -212,6 +210,7 @@ def test_image_ids_endpoint(environment, authenticated):
             f"FAILED RUN: environment {environment}, authenticated {authenticated}, exception: {e}"
         )
 
+
 @pytest.mark.parametrize(
     "environment",
     [
@@ -222,16 +221,13 @@ def test_image_ids_endpoint(environment, authenticated):
 @pytest.mark.parametrize("authenticated", [True])
 def test_image_endpoint(environment, authenticated):
 
-
     URL = LOCAL_URL if environment == "localhost" else PROD_URL
     URL += "/api/property_images"
 
     try:
         if authenticated:
             URL += f"?key={os.environ['API_KEY']}"
-            res = requests.get(
-                url=URL, params={"image_id": "---invalid---"}
-            )
+            res = requests.get(url=URL, params={"image_id": "---invalid---"})
             res = requests.get(
                 url=URL, params={"image_id": "02a17044-b120-4723-88d8-d98b41908dcc"}
             )
@@ -241,7 +237,6 @@ def test_image_endpoint(environment, authenticated):
             res = requests.get(url=URL)
             assert res.status_code == 401
 
-        
     except Exception as e:
         raise Exception(
             f"FAILED RUN: environment {environment}, authenticated {authenticated}, exception: {e}"
