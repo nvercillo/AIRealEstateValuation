@@ -3,8 +3,8 @@ import sys
 from dotenv import load_dotenv
 from os.path import join, dirname
 
-load_dotenv(join(dirname(__file__), "../.env"))
-sys.path.insert(0, "../")  # import parent folder
+load_dotenv(join(dirname(__file__), "../../.env"))
+sys.path.insert(0, "../../")  # import parent folder
 from statistics import stdev
 from utils import Math
 from models import Property
@@ -22,7 +22,7 @@ prop_model = Property()
 prop_controller = PropertiesController()
 
 
-all_props = [prop_model._query_by_id("98cb98f9-c7d2-43ad-a3d4-60804a2a2b46")]
+all_props = [prop_model._query_by_id("00143da0-6617-4de0-aae9-d3bf115fbc3a")]
 
 # objective function
 def objective(x, a, b, c):
@@ -84,18 +84,18 @@ for p in all_props:
     a, b, c = popt
 
     """ plot input vs output """
-    # pyplot.scatter(distances, std_prices)
+    pyplot.scatter(distances, std_prices)
 
-    # # define a sequence of inputs between the smallest and largest known inputs
-    # x_line = arange(min(distances), max(distances), 0.1)
+    # define a sequence of inputs between the smallest and largest known inputs
+    x_line = arange(min(distances), max(distances), 0.1)
 
-    # # calculate the output for the range
-    # y_line = objective(x_line, a, b, c)
+    # calculate the output for the range
+    y_line = objective(x_line, a, b, c)
 
-    # # create a line plot for the mapping function
-    # pyplot.plot(x_line, y_line, '--', color='red')
-    # pyplot.show()
+    # create a line plot for the mapping function
+    pyplot.plot(x_line, y_line, "--", color="red")
+    pyplot.show()
 
-    # y = a * x_line **2 + b*x_line + c
-    # pyplot.plot(x_line,y , "r" )
-    # pyplot.show()
+    y = a * x_line ** 2 + b * x_line + c
+    pyplot.plot(x_line, y, "r")
+    pyplot.show()

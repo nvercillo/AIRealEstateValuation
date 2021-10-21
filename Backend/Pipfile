@@ -42,6 +42,7 @@ matplotlib = "*"
 pytest = "*"
 naked = "*"
 flask-sqlalchemy = "*"
+pyqt5 = "*"
 
 [dev-packages]
 
