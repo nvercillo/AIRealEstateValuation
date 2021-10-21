@@ -16,13 +16,13 @@ from scipy.optimize import curve_fit
 from scipy import stats
 
 
-SEARCHING_DISTANCE = 4  # km
+SEARCHING_DISTANCE = 2  # km
 
 prop_model = Property()
 prop_controller = PropertiesController()
 
 
-all_props = [prop_model._query_by_id("00143da0-6617-4de0-aae9-d3bf115fbc3a")]
+all_props = [prop_model._query_by_id("00224370-c757-4f3a-9859-38dbeadab195")]
 
 # objective function
 def objective(x, a, b, c):
@@ -58,9 +58,9 @@ for p in all_props:
 
     print("Length of data before preprocessing: ", len(distances))
 
-    # # plot input vs output
-    # pyplot.scatter(distances, std_prices)
-    # pyplot.show()
+    # plot input vs output
+    pyplot.scatter(distances, std_prices)
+    pyplot.show()
 
     std_dev = stdev(std_prices)
     _3_std_dev = std_dev * 3  # should contain 97.5 % of normally distrubuted data
