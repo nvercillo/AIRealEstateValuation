@@ -37,4 +37,4 @@ class ImageController:
             return base64.b64encode(images[0][0])
 
 
-res = ImageController().get_image_by_id("---invalid---")
+# res = ImageController().get_image_by_id("---invalid---")

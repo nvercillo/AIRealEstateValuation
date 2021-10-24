@@ -161,6 +161,9 @@ class Property(db.Model):
             self.session.add(obj)
         self.session.commit()
 
+    def commit(self):
+        self.session.commit()
+
 
 class Image(db.Model):
 
@@ -228,4 +231,7 @@ class Image(db.Model):
     def _insert(self, bulk_list):
         for obj in bulk_list:
             self.session.add(obj)
+        self.session.commit()
+
+    def commit(self):
         self.session.commit()
