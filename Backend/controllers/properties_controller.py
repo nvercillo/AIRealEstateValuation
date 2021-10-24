@@ -6,7 +6,7 @@ from models import Property
 import numpy as np
 from scipy.spatial import distance
 from scipy.stats import zscore
-from utils import Math
+from utils.math import Math
 from operator import itemgetter
 
 # from dotenv import load_dotenv

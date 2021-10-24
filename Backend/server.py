@@ -4,15 +4,18 @@ from flask_restful import Api, Resource, reqparse
 from flask_sqlalchemy import SQLAlchemy
 from flask_cors import cross_origin
 from functools import wraps
-from utils import Utils, AlchemyEncoder
 from dotenv import load_dotenv
 from os.path import join, dirname
 from waitress import serve
 from flask import request, abort
+from utils.app_config import AppConfig
+from utils.encoders import AlchemyEncoder
+from utils.data_structures.lru_cache import LRUCache
 
 load_dotenv(join(dirname(__file__), ".env"))
 
-app = Utils.get_app_with_db_configured()
+image_cache = LRUCache(capacity=10)  # 10 images big
+app = AppConfig.get_app_with_db_configured()
 
 from models import db  # this line needs to be after app assignment
 
@@ -31,7 +34,7 @@ ImageController = image_controller.ImageController
 
 @app.route("/")
 @cross_origin(supports_credentials=True)
-@Utils.require_appkey
+@AppConfig.require_appkey
 def welcome_text():
     # if not (request.args.get("key") and request.args.get("key") == os.environ["API_KEY"]): abort(401)
     return "This is an authenticated server :)"
@@ -39,7 +42,7 @@ def welcome_text():
 
 @app.route("/api/adjacent_nodes", methods=["POST"])
 @cross_origin(supports_credentials=True)
-@Utils.require_appkey
+@AppConfig.require_appkey
 def get_adjacent_nodes():
 
     req = json.loads(request.data)
@@ -79,7 +82,7 @@ def get_adjacent_nodes():
 
 @app.route("/api/amenities", methods=["GET"])
 @cross_origin(supports_credentials=True)
-@Utils.require_appkey
+@AppConfig.require_appkey
 def get_amenities_from_id():
 
     requested_id = request.args.get("id")
@@ -97,7 +100,7 @@ def get_amenities_from_id():
 
 @app.route("/api/property_images_ids", methods=["GET"])
 @cross_origin(supports_credentials=True)
-@Utils.require_appkey
+@AppConfig.require_appkey
 def get_image_ids_for_property():
 
     property_id = request.args.get("property_id")
@@ -118,7 +121,7 @@ def get_image_ids_for_property():
 # TODO: Implement w DB images
 @app.route("/api/property_images", methods=["GET"])
 @cross_origin(supports_credentials=True)
-@Utils.require_appkey
+@AppConfig.require_appkey
 def get_property_image_from_id():
 
     image_id = request.args.get("image_id")
@@ -135,7 +138,7 @@ def get_property_image_from_id():
 
 @app.route("/api/enumerations", methods=["GET"])
 @cross_origin(supports_credentials=True)
-@Utils.require_appkey
+@AppConfig.require_appkey
 def get_enumations():
 
     data = EnumerationsController.get_all()
@@ -147,7 +150,7 @@ def get_enumations():
 
 @app.route("/api/get_cities_and_sample_addresses", methods=["GET"])
 @cross_origin(supports_credentials=True)
-@Utils.require_appkey
+@AppConfig.require_appkey
 def get_list_of_serviced_cities():
 
     locations = {

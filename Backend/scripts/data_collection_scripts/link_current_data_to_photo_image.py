@@ -14,7 +14,7 @@ import urllib
 import csv
 import pathlib
 from models import Property
-from utils import AlchemyEncoder
+from utils.encoders import AlchemyEncoder
 from flask_sqlalchemy import SQLAlchemy
 import threading
 from PIL import Image

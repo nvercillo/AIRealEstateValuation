@@ -3,10 +3,12 @@ import sys
 from dotenv import load_dotenv
 from os.path import join, dirname
 
+import numpy
+
 load_dotenv(join(dirname(__file__), "../../.env"))
 sys.path.insert(0, "../../")  # import parent folder
 from statistics import stdev
-from utils import Math
+from utils.math import Math
 from models import Property
 from operator import itemgetter
 from controllers.properties_controller import PropertiesController
@@ -22,7 +24,7 @@ prop_model = Property()
 prop_controller = PropertiesController()
 
 
-all_props = [prop_model._query_by_id("00224370-c757-4f3a-9859-38dbeadab195")]
+all_props = [prop_model._query_by_id("04dbd09f-ef9f-4dbd-b5e6-54272ab49ba2")]
 
 # objective function
 def objective(x, a, b, c):
@@ -34,7 +36,7 @@ for p in all_props:
     nearby = prop_controller.query_by_coords_and_filter(
         p.longitude,
         p.latitude,
-        filters={"style": p.style},
+        filters={"style": p.style, "square_footage": p.square_footage},
         SEARCHING_DISTANCE=SEARCHING_DISTANCE,
     )
 
@@ -99,3 +101,9 @@ for p in all_props:
     y = a * x_line ** 2 + b * x_line + c
     pyplot.plot(x_line, y, "r")
     pyplot.show()
+
+    correlation_matrix = numpy.corrcoef(x_line, y)
+    correlation_xy = correlation_matrix[0, 1]
+    r_squared = correlation_xy ** 2
+
+    print(r_squared)
