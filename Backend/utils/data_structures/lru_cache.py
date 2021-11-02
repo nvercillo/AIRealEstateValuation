@@ -33,17 +33,18 @@ class LRUCache(ABC):  # inheriting ABC makes class abstract
         if lru is None:
             return False
 
-        self.cache.pop(lru.data[0])  # [0] is key [1] is value
+        key = lru.data[0]
+        self.cache.pop(key)  # [0] is key [1] is value
 
-        return True
+        return key
 
     def put(self, key, value, persistent=False) -> None:
-
+        popped_key = None
         if persistent:
             if self.size() + 1 > self.capacity:
-                result = self.pop()
+                popped_key = self.pop()
 
-                if not result:
+                if not popped_key:
                     raise Exception("LRU cache is full, cannot add persistent data")
 
             self.persistent_cache[key] = value
@@ -53,13 +54,13 @@ class LRUCache(ABC):  # inheriting ABC makes class abstract
                 node.data[1] = value
                 self.ll.remove(node)
 
-                self.ll.append(node)  # replace MRU
+                self.ll.append(node)  # put to tail of linkedlist
 
             else:
                 if self.size() + 1 > self.capacity:
-                    result = self.pop()
+                    popped_key = self.pop()
 
-                    if not result:
+                    if not popped_key:
                         raise Exception(
                             "LRU cache is full of persistent data, cannot update"
                         )
@@ -67,6 +68,8 @@ class LRUCache(ABC):  # inheriting ABC makes class abstract
                 new_node = LinkedList.Node(data=[key, value])
                 self.ll.append(new_node)
                 self.cache[key] = new_node
+
+        return popped_key
 
     def size(self) -> int:
         return len(self.cache) + len(self.persistent_cache)
