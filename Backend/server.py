@@ -101,14 +101,15 @@ def get_amenities_from_id():
 def get_image_ids_for_property():
 
     property_id = request.args.get("property_id")
-    ids = image_controller.get_images_ids_for_property(property_id)
-    print(ids)
+    arr = image_controller.get_images_ids_for_property(property_id)
 
-    if len(ids) == 0:  # no images for property
-        ids = [ImageController.INVALID_IMAGE_ID, ImageController.INVALID_IMAGE_LEN]
+    if len(arr) == 0:  # no images for property
+        arr = [[ImageController.INVALID_IMAGE_ID, ImageController.INVALID_IMAGE_LEN]]
+
+    arr = [[e[0], (int(e[1]) / ImageController.INVALID_IMAGE_LEN)] for e in arr]
 
     response = app.response_class(
-        response=json.dumps(ids, cls=AlchemyEncoder),
+        response=json.dumps(arr, cls=AlchemyEncoder),
         status=200,
         mimetype="application/json",
     )
@@ -142,7 +143,7 @@ def get_property_image_from_id():
 @app.route("/api/enumerations", methods=["GET"])
 @cross_origin(supports_credentials=True)
 @AppConfig.require_appkey
-def get_enumations():
+def get_enumerations():
 
     data = EnumerationsController.get_all()
     response = app.response_class(

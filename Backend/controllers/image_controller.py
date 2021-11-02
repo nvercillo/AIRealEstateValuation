@@ -24,7 +24,6 @@ class ImageController:
             Image.__tablename__,
             f'`property_id` = "{property_id}"',
         )
-        print(res)
         return [list(r) for r in res]
 
     def get_image_by_id(self, id):

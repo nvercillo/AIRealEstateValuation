@@ -193,10 +193,10 @@ def test_image_ids_endpoint(environment, authenticated):
     try:
         if authenticated:
             URL += f"?key={os.environ['API_KEY']}"
-            res = requests.get(
-                url=URL, params={"property_id": "0f71385b-64fe-425d-b9b8-aba3f751c7a9"}
-            )
-            pprint(res.text)
+            # res = requests.get(
+            #     url=URL, params={"property_id": "0f71385b-64fe-425d-b9b8-aba3f751c7a9"}
+            # )
+            # pprint(res.text)
             res = requests.get(
                 url=URL, params={"property_id": "--this-property-id-doesnt-exist "}
             )
