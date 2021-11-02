@@ -1,3 +1,4 @@
+from math import ceil
 import os
 import json
 from flask_restful import Api, Resource, reqparse
@@ -13,7 +14,7 @@ from utils.data_structures.image_cache import ImageCache
 
 load_dotenv(join(dirname(__file__), ".env"))
 
-image_cache = ImageCache(capacity=11)  # 10 images big + default
+image_cache = ImageCache(capacity=3)  # 10 images big + default
 app = AppConfig.get_app_with_db_configured()
 
 from models import db  # this line needs to be after app assignment
@@ -35,6 +36,19 @@ image_controller = ImageController()
 # @AppConfig.require_appkey
 def welcome_text():
     return "This is an authenticated server :)"
+
+
+index = 0
+
+
+@app.route("/test_cache")
+@cross_origin(supports_credentials=True)
+# @AppConfig.require_appkey
+def test_cache():
+    global index
+    image_cache.put(index, 0)
+    index += 1
+    return str(image_cache)
 
 
 @app.route("/api/adjacent_nodes", methods=["POST"])
@@ -106,7 +120,7 @@ def get_image_ids_for_property():
     if len(arr) == 0:  # no images for property
         arr = [[ImageController.INVALID_IMAGE_ID, ImageController.INVALID_IMAGE_LEN]]
 
-    arr = [[e[0], (int(e[1]) / ImageController.INVALID_IMAGE_LEN)] for e in arr]
+    arr = [[e[0], ceil(int(e[1]) / ImageController.INVALID_IMAGE_LEN)] for e in arr]
 
     response = app.response_class(
         response=json.dumps(arr, cls=AlchemyEncoder),

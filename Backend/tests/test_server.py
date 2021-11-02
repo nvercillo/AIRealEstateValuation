@@ -252,3 +252,70 @@ def test_image_endpoint(environment, authenticated):
         raise Exception(
             f"FAILED RUN: environment {environment}, authenticated {authenticated}, exception: {e}"
         )
+
+
+@pytest.mark.parametrize(
+    "environment",
+    [
+        # "localhost", "production"
+        "localhost"
+    ],
+)
+@pytest.mark.parametrize("authenticated", [True])
+def test_image_endpoint(environment, authenticated):
+
+    URL = LOCAL_URL if environment == "localhost" else PROD_URL
+    URL += "/api/property_images"
+
+    try:
+        if authenticated:
+            URL += f"?key={os.environ['API_KEY']}"
+            res = requests.get(
+                url=URL,
+                params={
+                    "image_id": "---invalid---",
+                    "img_index": 0,
+                },
+            )
+            assert res.status_code == 200
+            res = requests.get(
+                url=URL,
+                params={
+                    "image_id": "02a17044-b120-4723-88d8-d98b41908dcc",
+                    "img_index": 0,
+                },
+            )
+            assert res.status_code == 200
+            res = requests.get(
+                url=URL,
+                params={
+                    "image_id": "0018a5b3-232c-43e3-9b9d-7d8bba264ffc",
+                    "img_index": 0,
+                },
+            )
+            # assert res.status_code == 200
+            # res = requests.get(
+            #     url=URL,
+            #     params={
+            #         "image_id": "001072f9-d6e6-4aa7-8e82-42f58627555c",
+            #         "img_index": 0,
+            #     },
+            # )
+            # assert res.status_code == 200
+            # res = requests.get(
+            #     url=URL,
+            #     params={
+            #         "image_id": "001b30b9-fcd0-47bd-a495-af5c4327fee9",
+            #         "img_index": 0,
+            #     },
+            # )
+            # assert res.status_code == 200
+            print(res.text)
+        else:
+            res = requests.get(url=URL)
+            assert res.status_code == 401
+
+    except Exception as e:
+        raise Exception(
+            f"FAILED RUN: environment {environment}, authenticated {authenticated}, exception: {e}"
+        )
