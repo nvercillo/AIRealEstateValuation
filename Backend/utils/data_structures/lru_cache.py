@@ -13,11 +13,12 @@ class LRUCache(ABC):  # inheriting ABC makes class abstract
 
     def initialize(self, capacity: int):
         self.cache = {}
+        self.persistent_cache = {}
         self.capacity = capacity
         self.ll = LinkedList()
 
     def get(self, key):
-        if key not in self.cache:
+        if key not in self.persistent_cache and key not in self.cache:
             raise Exception(f"Key {key} not in {self.get_type()} Cache")
 
         node = self.cache[key]
@@ -26,23 +27,49 @@ class LRUCache(ABC):  # inheriting ABC makes class abstract
         self.ll.append(node)  # replace MRU
         return node.data[1]  # data[1] is value
 
-    def put(self, key, value) -> None:
+    def pop(self) -> bool:  # success or failure
 
-        if key in self.cache:
-            node = self.cache[key]
-            node.data[1] = value
-            self.ll.remove(node)
+        lru = self.ll.pop_head()  # pop LRU
+        if lru is None:
+            return False
 
-            self.ll.append(node)  # replace MRU
+        self.cache.pop(lru.data[0])  # [0] is key [1] is value
 
+        return True
+
+    def put(self, key, value, persistent=False) -> None:
+
+        if persistent:
+            if self.size() + 1 > self.capacity:
+                result = self.pop()
+
+                if not result:
+                    raise Exception("LRU cache is full, cannot add persistent data")
+
+            self.persistent_cache[key] = value
         else:
-            if len(self.cache) + 1 > self.capacity:
-                lru = self.ll.pop_head()  # pop LRU
-                self.cache.pop(lru.data[0])  # [0] is key [1] is value
+            if key in self.cache:
+                node = self.cache[key]
+                node.data[1] = value
+                self.ll.remove(node)
 
-            new_node = LinkedList.Node(data=[key, value])
-            self.ll.append(new_node)
-            self.cache[key] = new_node
+                self.ll.append(node)  # replace MRU
+
+            else:
+                if self.size() + 1 > self.capacity:
+                    result = self.pop()
+
+                    if not result:
+                        raise Exception(
+                            "LRU cache is full of persistent data, cannot update"
+                        )
+
+                new_node = LinkedList.Node(data=[key, value])
+                self.ll.append(new_node)
+                self.cache[key] = new_node
+
+    def size(self) -> int:
+        return len(self.cache) + len(self.persistent_cache)
 
     def contains(self, key) -> bool:
         return key in self.cache

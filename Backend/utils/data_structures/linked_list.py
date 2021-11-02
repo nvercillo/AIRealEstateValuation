@@ -35,7 +35,7 @@ class LinkedList:
 
     def remove(self, node: Node):
         if self.head is None:
-            return -1  # element doesnt exist
+            return None  # element doesnt exist
 
         if id(self.head) == id(self.tail):  # pop off first element, len == 1
             self.head = None
@@ -72,10 +72,9 @@ class LinkedList:
             temp = temp.next
 
         return s
-    
+
     def __repr__(self):
         return self.__str__
-    
+
     def print(self):
         print(self.__str__)
-        

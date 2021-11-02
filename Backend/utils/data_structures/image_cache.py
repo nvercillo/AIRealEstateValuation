@@ -12,8 +12,11 @@ class ImageCache(LRUCache):
 
     _type = "Image"
 
-    def __init__(self, capacity: int):
+    def __init__(self, capacity: int, default_image_id=None):
         super(ImageCache, self).initialize(capacity=capacity)
+
+        if default_image_id is not None:
+            self.store_image(default_image_id)
 
     def get_type(self):
         return self._type
