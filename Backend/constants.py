@@ -1,6 +1,9 @@
 from enum import Enum
 
 
+MAX_NUM_BYTES_PER_PKT = 17000  # 17 MB
+
+
 class Enumerations(Enum):
     class _Type(Enum):
         condo = "Condo Apartment"

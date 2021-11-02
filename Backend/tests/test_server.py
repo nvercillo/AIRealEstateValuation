@@ -21,7 +21,7 @@ PROD_URL = "https://ai-backend-flask.herokuapp.com"
         "localhost"
     ],
 )
-@pytest.mark.parametrize("authenticated", [True, True])
+@pytest.mark.parametrize("authenticated", [False])
 def test_home_endpoint(environment, authenticated):
 
     URL = LOCAL_URL if environment == "localhost" else PROD_URL
@@ -194,8 +194,9 @@ def test_image_ids_endpoint(environment, authenticated):
         if authenticated:
             URL += f"?key={os.environ['API_KEY']}"
             res = requests.get(
-                url=URL, params={"property_id": "5f70921b-6b76-4f54-9664-43372e570a3b"}
+                url=URL, params={"property_id": "0f71385b-64fe-425d-b9b8-aba3f751c7a9"}
             )
+            pprint(res.text)
             res = requests.get(
                 url=URL, params={"property_id": "--this-property-id-doesnt-exist "}
             )
@@ -227,9 +228,19 @@ def test_image_endpoint(environment, authenticated):
     try:
         if authenticated:
             URL += f"?key={os.environ['API_KEY']}"
-            res = requests.get(url=URL, params={"image_id": "---invalid---"})
             res = requests.get(
-                url=URL, params={"image_id": "02a17044-b120-4723-88d8-d98b41908dcc"}
+                url=URL,
+                params={
+                    "image_id": "---invalid---",
+                    "img_index": 0,
+                },
+            )
+            res = requests.get(
+                url=URL,
+                params={
+                    "image_id": "02a17044-b120-4723-88d8-d98b41908dcc",
+                    "img_index": 0,
+                },
             )
             assert res.status_code == 200
             print(res.text)

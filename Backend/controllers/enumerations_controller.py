@@ -1,7 +1,7 @@
 import sys
 
 sys.path.insert(0, "..")  # import parent folder
-from constant_enums import Enumerations
+from constants import Enumerations
 
 
 class EnumerationsController:

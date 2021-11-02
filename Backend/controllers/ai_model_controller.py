@@ -5,7 +5,7 @@ sys.path.insert(0, "..")  # import parent folder
 from models import Property
 from numpy import random
 from scipy.spatial import distance
-from constant_enums import Enumerations
+from constants import Enumerations
 import math
 
 

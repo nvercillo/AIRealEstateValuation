@@ -13,15 +13,19 @@ load_dotenv(join(dirname(__file__), "../.env"))
 class ImageController:
 
     INVALID_IMAGE_ID = "---invalid---"
+    INVALID_IMAGE_LEN = 11610  # bytes
 
     def __init__(self):
         self.image = Image(start_engine=True)
 
     def get_images_ids_for_property(self, property_id):
         res = self.image._select_from_where(
-            "`id`", "`PROPERTY-IMAGES`", f'`property_id` = "{property_id}"'
+            "`id`, `byte_size`",
+            Image.__tablename__,
+            f'`property_id` = "{property_id}"',
         )
-        return [str(r[0]) for r in res]
+        print(res)
+        return [list(r) for r in res]
 
     def get_image_by_id(self, id):
         if id == self.INVALID_IMAGE_ID:  # no houses exist
@@ -32,7 +36,7 @@ class ImageController:
 
         else:
             images = self.image._select_from_where(
-                "`raw_image_binary`", "`PROPERTY-IMAGES`", f'ID = "{id}"'
+                "`raw_image_binary`", Image.__tablename__, f'ID = "{id}"'
             )
             return base64.b64encode(images[0][0])
 

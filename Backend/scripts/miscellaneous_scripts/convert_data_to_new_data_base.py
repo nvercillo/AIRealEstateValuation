@@ -37,7 +37,7 @@ properties = prop_model._query_all()
 copy_properties = []
 for p in properties:
     copy_properties.append(
-        PropertyData(
+        Property(
             p.address,
             p.sold_price,
             p.soldOn,
@@ -50,5 +50,5 @@ for p in properties:
         )
     )
 
-bh_prop_model = PropertyData(not_insertion=True)
+bh_prop_model = Property(not_insertion=True)
 bh_prop_model._insert(copy_properties)

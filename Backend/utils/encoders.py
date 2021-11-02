@@ -1,3 +1,4 @@
+from decimal import Decimal
 import json
 from sqlalchemy.ext.declarative import DeclarativeMeta
 from sqlalchemy.dialects.postgresql import UUID
@@ -11,6 +12,9 @@ class AlchemyEncoder(json.JSONEncoder):
         if isinstance(obj, UUID):
             # if the obj is uuid, we simply return the value of uuid
             return obj.hex
+
+        if isinstance(obj, Decimal):
+            return int(obj)
 
         if isinstance(obj.__class__, DeclarativeMeta):
 

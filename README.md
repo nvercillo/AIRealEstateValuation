@@ -80,3 +80,12 @@ cd backend;
 pytest (outside of venv)
 ```
 
+
+## Deploy
+
+Requirements: have gcloud installed 
+
+```
+gcloud init # then link to current project 
+gcloud app deploy
+```

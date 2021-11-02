@@ -14,7 +14,7 @@ db = SQLAlchemy()
 
 class Property(db.Model):
 
-    __tablename__ = "AI-PROPERTIES-DATA"
+    __tablename__ = "AI_PROPERTY_DATA"
 
     id = db.Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     address = db.Column(db.String(255), index=True)
@@ -167,7 +167,7 @@ class Property(db.Model):
 
 class Image(db.Model):
 
-    __tablename__ = "PROPERTY-IMAGES"
+    __tablename__ = "PROPERTY_IMAGES"
 
     id = db.Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     property_id = db.Column(UUID(as_uuid=True), index=True)

@@ -1,16 +1,24 @@
 from .linked_list import LinkedList
+from abc import ABC, abstractmethod
 
 
-class LRUCache:
+class LRUCache(ABC):  # inheriting ABC makes class abstract
+    @abstractmethod
     def __init__(self, capacity: int):
+        pass
+
+    @abstractmethod
+    def get_type(self):
+        pass
+
+    def initialize(self, capacity: int):
         self.cache = {}
         self.capacity = capacity
         self.ll = LinkedList()
 
-    def get(self, key: int) -> int:
-
+    def get(self, key):
         if key not in self.cache:
-            return -1
+            raise Exception(f"Key {key} not in {self.get_type()} Cache")
 
         node = self.cache[key]
         self.ll.remove(node)
@@ -18,7 +26,7 @@ class LRUCache:
         self.ll.append(node)  # replace MRU
         return node.data[1]  # data[1] is value
 
-    def put(self, key: int, value: int) -> None:
+    def put(self, key, value) -> None:
 
         if key in self.cache:
             node = self.cache[key]
@@ -35,3 +43,15 @@ class LRUCache:
             new_node = LinkedList.Node(data=[key, value])
             self.ll.append(new_node)
             self.cache[key] = new_node
+
+    def contains(self, key) -> bool:
+        return key in self.cache
+
+    def __str__(self):
+        return f"<LRU:  {str(self.ll)}  >"
+
+    def __repr__(self):
+        return self.__str__
+
+    def print(self):
+        print(self.__str__)

@@ -29,28 +29,28 @@ def update_cols_with_json_data():
                 int(json_dict["bathNum"]) if json_dict["bathNum"] != "n/a" else 0
             )
 
-            query_str = f'UPDATE AI-PROPERTIES-DATA SET `num_bedrooms` = {num_beds} WHERE ID = "{p.id}";'
+            query_str = f'UPDATE AI_PROPERTY_DATA SET `num_bedrooms` = {num_beds} WHERE ID = "{p.id}";'
             print(query_str)
             con.execute(query_str)
 
-            query_str = f'UPDATE AI-PROPERTIES-DATA SET `num_bathrooms` = {num_bathrooms} WHERE ID = "{p.id}";'
+            query_str = f'UPDATE AI_PROPERTY_DATA SET `num_bathrooms` = {num_bathrooms} WHERE ID = "{p.id}";'
             print(query_str)
             con.execute(query_str)
 
             if num_dens > 0:
-                query_str = f'UPDATE AI-PROPERTIES-DATA SET `num_dens` = {num_dens} WHERE ID = "{p.id}";'
+                query_str = f'UPDATE AI_PROPERTY_DATA SET `num_dens` = {num_dens} WHERE ID = "{p.id}";'
                 print(query_str)
                 con.execute(query_str)
 
-            query_str = f'UPDATE AI-PROPERTIES-DATA SET `square_footage` = "{square_footage}" WHERE ID = "{p.id}";'
+            query_str = f'UPDATE AI_PROPERTY_DATA SET `square_footage` = "{square_footage}" WHERE ID = "{p.id}";'
             print(query_str)
             con.execute(query_str)
 
-            query_str = f'UPDATE AI-PROPERTIES-DATA SET `property_type` = "{prop_type}" WHERE ID = "{p.id}";'
+            query_str = f'UPDATE AI_PROPERTY_DATA SET `property_type` = "{prop_type}" WHERE ID = "{p.id}";'
             print(query_str)
             con.execute(query_str)
 
-            query_str = f'UPDATE AI-PROPERTIES-DATA SET `parking_spots` = {parking_total} WHERE ID = "{p.id}";'
+            query_str = f'UPDATE AI_PROPERTY_DATA SET `parking_spots` = {parking_total} WHERE ID = "{p.id}";'
             print(query_str)
             con.execute(query_str)
 

@@ -64,12 +64,18 @@ class LinkedList:
     def pop_head(self) -> Node:
         return self.remove(self.head)
 
-    def print(self):
+    def __str__(self):
         temp = self.head
         s = ""
         while temp is not None:
             s += str(temp)
             temp = temp.next
 
-        print(s)
         return s
+    
+    def __repr__(self):
+        return self.__str__
+    
+    def print(self):
+        print(self.__str__)
+        

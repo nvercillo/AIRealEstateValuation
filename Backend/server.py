@@ -3,40 +3,37 @@ import json
 from flask_restful import Api, Resource, reqparse
 from flask_sqlalchemy import SQLAlchemy
 from flask_cors import cross_origin
-from functools import wraps
 from dotenv import load_dotenv
 from os.path import join, dirname
 from waitress import serve
 from flask import request, abort
 from utils.app_config import AppConfig
 from utils.encoders import AlchemyEncoder
-from utils.data_structures.lru_cache import LRUCache
+from utils.data_structures.image_cache import ImageCache
 
 load_dotenv(join(dirname(__file__), ".env"))
 
-image_cache = LRUCache(capacity=10)  # 10 images big
+image_cache = ImageCache(capacity=11)  # 10 images big + default
 app = AppConfig.get_app_with_db_configured()
 
 from models import db  # this line needs to be after app assignment
 
-from controllers import enumerations_controller
-from controllers import properties_controller
-from controllers import ai_model_controller
-from controllers import image_controller
+from controllers.enumerations_controller import EnumerationsController
+from controllers.properties_controller import PropertiesController
+from controllers.ai_model_controller import AIModelController
+from controllers.image_controller import ImageController
 
-EnumerationsController = enumerations_controller.EnumerationsController
-PropertiesController = properties_controller.PropertiesController
-AIModelController = ai_model_controller.AIModelController
-ImageController = image_controller.ImageController
+property_controller = PropertiesController()
+ai_model_controller = AIModelController()
+image_controller = ImageController()
 
 """ ROUTES """
 
 
 @app.route("/")
 @cross_origin(supports_credentials=True)
-@AppConfig.require_appkey
+# @AppConfig.require_appkey
 def welcome_text():
-    # if not (request.args.get("key") and request.args.get("key") == os.environ["API_KEY"]): abort(401)
     return "This is an authenticated server :)"
 
 
@@ -47,17 +44,17 @@ def get_adjacent_nodes():
 
     req = json.loads(request.data)
 
-    data, five_nearest_ids = PropertiesController()._get_adjacent_nodes(
+    data, five_nearest_ids = property_controller._get_adjacent_nodes(
         req["lng"], req["lat"]
     )
 
-    community, district = PropertiesController()._get_community_data_from_nearest(
+    community, district = property_controller._get_community_data_from_nearest(
         five_nearest_ids
     )
 
-    predicted_price = AIModelController().dummy_predict_price()
+    predicted_price = ai_model_controller.dummy_predict_price()
 
-    # predicted_price = AIModelController().predict_price([
+    # predicted_price = ai_model_controller.predict_price([
     #     # req['lng'],
     #     # req['lat'],
     #     req['Sqaurefootage'],
@@ -87,7 +84,7 @@ def get_amenities_from_id():
 
     requested_id = request.args.get("id")
 
-    prop = PropertiesController()._get_by_id(requested_id)
+    prop = property_controller._get_by_id(requested_id)
 
     response = app.response_class(
         response=json.dumps(prop, cls=AlchemyEncoder),
@@ -104,10 +101,11 @@ def get_amenities_from_id():
 def get_image_ids_for_property():
 
     property_id = request.args.get("property_id")
-    ids = ImageController().get_images_ids_for_property(property_id)
+    ids = image_controller.get_images_ids_for_property(property_id)
+    print(ids)
 
     if len(ids) == 0:  # no images for property
-        ids = [ImageController.INVALID_IMAGE_ID]
+        ids = [ImageController.INVALID_IMAGE_ID, ImageController.INVALID_IMAGE_LEN]
 
     response = app.response_class(
         response=json.dumps(ids, cls=AlchemyEncoder),
@@ -118,17 +116,22 @@ def get_image_ids_for_property():
     return response
 
 
-# TODO: Implement w DB images
 @app.route("/api/property_images", methods=["GET"])
 @cross_origin(supports_credentials=True)
 @AppConfig.require_appkey
 def get_property_image_from_id():
 
     image_id = request.args.get("image_id")
-    raw_image_binary = ImageController().get_image_by_id(image_id)
+    img_index = int(request.args.get("img_index"))
+
+    if image_cache.contains(image_id):  # check cache
+        img_slice = image_cache.get(image_id)[img_index]
+    else:  # make expensive db call
+        image_cache.store_image(image_id)
+        img_slice = image_cache.get_image_slice(image_id, img_index)
 
     response = app.response_class(
-        response=raw_image_binary,
+        response=img_slice,
         status=200,
         mimetype="application/json",
     )
