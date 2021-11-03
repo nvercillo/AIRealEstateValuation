@@ -188,6 +188,11 @@ class Image(db.Model):
             echo=not (os.environ["PRODUCTION"] and os.environ["PRODUCTION"] == "True"),
         )
 
+        self.query_engine = create_engine(
+            os.environ["PRODUCTION_DB_URI"],
+            echo=not (os.environ["PRODUCTION"] and os.environ["PRODUCTION"] == "True"),
+        )
+
         Session = sessionmaker(bind=self.engine)
         self.session = Session()
 
@@ -220,8 +225,7 @@ class Image(db.Model):
         return res
 
     def _select_from_where(self, attributes, relation, condition, distinct=None):
-        with self.engine.connect() as con:
-
+        with self.query_engine.connect() as con:
             result = con.execute(
                 f"SELECT {'' if not distinct else 'DISTINCT'} {attributes} FROM {relation} WHERE {condition};"
             )

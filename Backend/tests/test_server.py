@@ -19,7 +19,7 @@ PROD_URL = "https://ai-backend-flask.herokuapp.com"
     [
         # "localhost", "production"
         "localhost"
-    ],
+    ],  
 )
 @pytest.mark.parametrize("authenticated", [False])
 def test_home_endpoint(environment, authenticated):
@@ -27,13 +27,13 @@ def test_home_endpoint(environment, authenticated):
     URL = LOCAL_URL if environment == "localhost" else PROD_URL
 
     try:
-        if authenticated:
-            # URL += f"?key={os.environ['API_KEY']}"
-            res = requests.get(url=URL, params={"key": os.environ["API_KEY"]})
-            assert res.status_code == 200
-        else:
-            res = requests.get(url=URL)
-            assert res.status_code == 401
+        # if
+        URL += f"?key={os.environ['API_KEY']}"
+        res = requests.get(url=URL, params={"key": os.environ["API_KEY"]})
+        assert res.status_code == 200
+        # else:
+        #     res = requests.get(url=URL)
+        #     assert res.status_code == 401
 
     except Exception as e:
         raise Exception(
