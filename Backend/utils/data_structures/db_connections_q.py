@@ -4,6 +4,7 @@ from sqlalchemy import exc
 from sqlalchemy.exc import ResourceClosedError
 from .heap import Heap
 import os
+from threading import Lock
 from sqlalchemy import create_engine
 
 db_engine = create_engine(
@@ -29,10 +30,31 @@ class DatabaseConnectionsQueue(Heap):
             finally:
                 return res
 
+        def _is_dead(self):
+            return self.connection.closed
+
+    COUNT_TO_PURGE = 10
+
     def __init__(self, capacity):
         super().__init__(capacity, self.DatabaseConnectionNode)
+        self.count_to_purge = self.COUNT_TO_PURGE
+        self.mutex = Lock()
+
+    def decrement_count(self):
+        self.mutex.acquire()
+        self.count_to_purge -= 1
+        count = self.count_to_purge
+        self.mutex.release()
+
+        if count <= 0:
+            self.purge_dead_nodes()
+
+        self.mutex.acquire()
+        self.count_to_purge = self.COUNT_TO_PURGE
+        self.mutex.release()
 
     def _query(self, query_string):
+        self.decrement_count()
 
         node = self._find_avalible()
         if node is None:

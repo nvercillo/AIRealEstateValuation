@@ -2,6 +2,9 @@ import sys
 import time
 import heapq
 from threading import Lock
+from numpy import append
+
+from sqlalchemy.orm import query
 
 sys.path.insert(0, "../../")  # import parent folder
 from utils.abstract import AbstractBaseClass, abstractmethod
@@ -14,6 +17,10 @@ class Heap:
         sortable_value = None
         node_lock = Lock()
 
+        @abstractmethod
+        def _is_dead(self):
+            pass
+
         def __lt__(self, that):
             return self.sortable_value < that.sortable_value
 
@@ -21,6 +28,7 @@ class Heap:
         self.queue = [HeapNodeClass() for _ in range(capacity)]
         self.capacity = capacity
         self.heap_lock = Lock()
+        self.HeapNodeClass = HeapNodeClass
 
     def _find_avalible(self):
         # iterate linearly
@@ -47,3 +55,22 @@ class Heap:
             return True
         else:
             return False
+
+    def _purge_dead_nodes(self) -> None:
+        if self.heap_lock.acquire(blocking=True, timeout=5):  # 1 second timeout
+            to_delete = []
+            for i in range(len(self.queue)):
+                if self.queue[i]._is_dead():
+                    to_delete.append(i)
+
+            for i in range(len(to_delete) - 1, -1, -1):
+                self.queue.pop(to_delete[i])
+
+            for i in range(len(to_delete)):
+                self.queue.append(self.HeapNodeClass())
+
+            heapq.heapify(self.queue)
+
+            self.heap_lock.release()
+        else:
+            raise Exception("Unable to purge")
