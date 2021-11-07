@@ -9,13 +9,12 @@ from os.path import join, dirname
 from waitress import serve
 from flask import request, abort
 from utils.app_config import AppConfig
-from constants import MAX_NUM_BYTES_PER_PKT
 from utils.encoders import AlchemyEncoder
 from utils.data_structures.image_cache import ImageCache
 
 load_dotenv(join(dirname(__file__), ".env"))
 
-image_cache = ImageCache(capacity=1)  # 10 images big + default
+image_cache = ImageCache(capacity=3)  # 10 images big + default
 app = AppConfig.get_app_with_db_configured()
 
 from models import db  # this line needs to be after app assignment
@@ -25,16 +24,17 @@ from controllers.properties_controller import PropertiesController
 from controllers.ai_model_controller import AIModelController
 from controllers.image_controller import ImageController
 
+
+image_controller = ImageController()
 property_controller = PropertiesController()
 ai_model_controller = AIModelController()
-image_controller = ImageController()
 
 """ ROUTES """
 
 
 @app.route("/")
 @cross_origin(supports_credentials=True)
-@AppConfig.require_appkey
+# @AppConfig.require_appkey
 def welcome_text():
     return "This is an authenticated server :)"
 
@@ -100,17 +100,15 @@ def get_amenities_from_id():
     requested_id = request.args.get("id")
 
     prop = property_controller._get_by_id(requested_id)
-
-
     if prop:
         response = app.response_class(
-            response=json.dumps(prop, cls=AlchemyEncoder),
+            response=prop.data,
             status=200,
             mimetype="application/json",
         )
     else:
         response = app.response_class(
-            response=json.dumps(prop, cls=AlchemyEncoder),
+            response=f'Property id: "{requested_id}" not in database',
             status=400,
             mimetype="application/json",
         )
@@ -129,7 +127,7 @@ def get_image_ids_for_property():
     if len(arr) == 0:  # no images for property
         arr = [[ImageController.INVALID_IMAGE_ID, ImageController.INVALID_IMAGE_LEN]]
 
-    arr = [[e[0], ceil(int(e[1]) / MAX_NUM_BYTES_PER_PKT)] for e in arr]
+    arr = [[e[0], ceil(int(e[1]) / ImageController.INVALID_IMAGE_LEN)] for e in arr]
 
     response = app.response_class(
         response=json.dumps(arr, cls=AlchemyEncoder),
@@ -172,7 +170,6 @@ def get_enumerations():
     response = app.response_class(
         response=json.dumps(data), status=200, mimetype="application/json"
     )
-
     return response
 
 

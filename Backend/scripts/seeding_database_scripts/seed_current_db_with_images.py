@@ -7,7 +7,7 @@ from pprint import pprint
 
 sys.path.insert(0, "../../")  # import parent folder
 import os
-from models import Image
+from models.image_model import Image
 import pathlib
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.dialects.postgresql import insert

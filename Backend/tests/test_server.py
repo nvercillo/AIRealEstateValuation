@@ -19,7 +19,7 @@ PROD_URL = "https://ai-backend-flask.herokuapp.com"
     [
         # "localhost", "production"
         "localhost"
-    ],  
+    ],
 )
 @pytest.mark.parametrize("authenticated", [False])
 def test_home_endpoint(environment, authenticated):
@@ -27,13 +27,13 @@ def test_home_endpoint(environment, authenticated):
     URL = LOCAL_URL if environment == "localhost" else PROD_URL
 
     try:
-        # if
-        URL += f"?key={os.environ['API_KEY']}"
-        res = requests.get(url=URL, params={"key": os.environ["API_KEY"]})
-        assert res.status_code == 200
-        # else:
-        #     res = requests.get(url=URL)
-        #     assert res.status_code == 401
+        if authenticated:
+            # URL += f"?key={os.environ['API_KEY']}"
+            res = requests.get(url=URL, params={"key": os.environ["API_KEY"]})
+            assert res.status_code == 200
+        else:
+            res = requests.get(url=URL)
+            assert res.status_code == 200
 
     except Exception as e:
         raise Exception(
@@ -202,48 +202,6 @@ def test_image_ids_endpoint(environment, authenticated):
             )
             pprint(res.text)
             assert res.status_code == 200
-        else:
-            res = requests.get(url=URL)
-            assert res.status_code == 401
-
-    except Exception as e:
-        raise Exception(
-            f"FAILED RUN: environment {environment}, authenticated {authenticated}, exception: {e}"
-        )
-
-
-@pytest.mark.parametrize(
-    "environment",
-    [
-        # "localhost", "production"
-        "localhost"
-    ],
-)
-@pytest.mark.parametrize("authenticated", [True])
-def test_image_endpoint(environment, authenticated):
-
-    URL = LOCAL_URL if environment == "localhost" else PROD_URL
-    URL += "/api/property_images"
-
-    try:
-        if authenticated:
-            URL += f"?key={os.environ['API_KEY']}"
-            res = requests.get(
-                url=URL,
-                params={
-                    "image_id": "---invalid---",
-                    "img_index": 0,
-                },
-            )
-            res = requests.get(
-                url=URL,
-                params={
-                    "image_id": "02a17044-b120-4723-88d8-d98b41908dcc",
-                    "img_index": 0,
-                },
-            )
-            assert res.status_code == 200
-            print(res.text)
         else:
             res = requests.get(url=URL)
             assert res.status_code == 401

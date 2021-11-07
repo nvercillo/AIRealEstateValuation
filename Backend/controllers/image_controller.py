@@ -2,7 +2,7 @@ import sys
 import base64
 
 sys.path.insert(0, "..")  # import parent folder
-from models import Image
+from models.image_model import Image
 
 from dotenv import load_dotenv
 from os.path import join, dirname

@@ -2,7 +2,8 @@ import json
 import sys
 
 sys.path.insert(0, "..")  # import parent folder
-from models import Property
+# from models import Property
+from models.property_model import Property
 import numpy as np
 from scipy.spatial import distance
 from scipy.stats import zscore
