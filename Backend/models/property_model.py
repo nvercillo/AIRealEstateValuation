@@ -1,8 +1,6 @@
 import os
 import uuid
-from sqlalchemy.dialects.postgresql import JSON
-from sqlalchemy import Integer, create_engine
-from sqlalchemy.types import BLOB
+from sqlalchemy import Integer, Text
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.dialects.postgresql import UUID
 from .base_model import BaseModel
@@ -28,7 +26,7 @@ class Property(db.Model, BaseModel):
     square_footage = db.Column(db.String(10))
     property_type = db.Column(db.String(35))
     parking_spots = db.Column(Integer)
-    data = db.Column(JSON)
+    data = db.Column(Text)
 
     def __init__(
         self,

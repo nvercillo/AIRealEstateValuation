@@ -20,10 +20,12 @@ class DatabaseConnectionsQueue(Heap):
             self.connection = db_engine.connect()
             self.available = True
 
-        def _query_on_connection(self, query_string):
+        def _query_on_connection(self, query_string, select=True):
+            res = None
             try:
                 result_cnx = self.connection.execute(query_string)
-                res = result_cnx.fetchall()
+                if select:
+                    res = result_cnx.fetchall()
             except Exception as err:
                 print("ERROR: ", err)
                 res = None
@@ -53,16 +55,14 @@ class DatabaseConnectionsQueue(Heap):
         self.count_to_purge = self.COUNT_TO_PURGE
         self.mutex.release()
 
-    def _query(self, query_string):
+    def _query(self, query_string, select=True):
         self.decrement_count()
 
         node = self._find_avalible()
         if node is None:
             raise Exception("Unable to find available node during timeout period")
 
-        print("res")
-        query_result = node._query_on_connection(query_string)
-        print("res", query_result)
+        query_result = node._query_on_connection(query_string, select)
 
         if self._update_node_val(node, time.time()):
             return query_result

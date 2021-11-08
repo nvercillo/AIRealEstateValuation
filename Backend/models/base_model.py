@@ -54,12 +54,12 @@ class BaseModel(AbstractBaseClass):
         return f"SELECT {'' if not distinct else 'DISTINCT'} {attributes} FROM {relation} WHERE {condition};"
 
     def _select_from_where(self, attributes, relation, condition, distinct=None):
-        return self._select_query(
+        return self._query(
             self._select_from_where_str(attributes, relation, condition, distinct)
         )
 
-    def _select_query(self, query_str):
-        return DB_CONNECTIONS._query(query_string=query_str)
+    def _query(self, query_str, select=True):
+        return DB_CONNECTIONS._query(query_string=query_str, select=select)
 
     def _insert(self, bulk_list):
         for obj in bulk_list:
