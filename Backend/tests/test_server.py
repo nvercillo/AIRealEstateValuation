@@ -8,10 +8,10 @@ from pprint import pprint
 
 load_dotenv(join(dirname(__file__), "../.env"))
 
-LOCAL_URL = "http://localhost:5000"
+LOCAL_URL = "http://localhost:5050"
 PROD_URL = "https://ai-backend-flask.herokuapp.com"
 
-""" REQUIREMENTS: have server running on localhost:5000 """
+""" REQUIREMENTS: have server running on localhost:5050 """
 
 
 @pytest.mark.parametrize(

@@ -63,9 +63,9 @@ def get_adjacent_nodes():
         req["lng"], req["lat"]
     )
 
-    community, district = property_controller._get_community_data_from_nearest(
-        five_nearest_ids
-    )
+    # community, district = property_controller._get_community_data_from_nearest(
+    #     five_nearest_ids
+    # )
 
     predicted_price = ai_model_controller.dummy_predict_price()
 
@@ -197,9 +197,8 @@ db.init_app(app)
 if __name__ == "__main__":
     if os.environ["PRODUCTION"] and os.environ["PRODUCTION"] == "True":
         print("\nStarted production server .... :)\n")
-        print("APP URL: https://localhost:5000\n")
+        print("APP URL: https://localhost:5050\n")
         print(f"Production DB URI: {os.environ['DB_URI']}")
-        app.run(debug=True)  # run default flask server
-        # serve(app, host="0.0.0.0", port=5000)  # run production server
+        serve(app, host="0.0.0.0", port=5050)  # run production server
     else:
-        app.run(debug=True)  # run default flask server
+        app.run(debug=True, port=5050)  # run default flask server
