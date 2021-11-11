@@ -76,8 +76,9 @@ python server.py
 ### Testing 
 Requirements: pytest 
 ```
-cd backend;
-pytest (outside of venv)
+cd Backend;
+pipenv shell;
+pytest -s;
 ```
 
 

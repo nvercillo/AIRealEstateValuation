@@ -97,9 +97,9 @@ def get_adjacent_nodes():
 @AppConfig.require_appkey
 def get_amenities_from_id():
 
-    requested_id = request.args.get("id")
+    requested_property_id = request.args.get("id")
 
-    prop = property_controller._get_by_id(requested_id)
+    prop = property_controller._get_by_id(requested_property_id)
     if prop:
         response = app.response_class(
             response=prop.data,
@@ -108,7 +108,7 @@ def get_amenities_from_id():
         )
     else:
         response = app.response_class(
-            response=f'Property id: "{requested_id}" not in database',
+            response=f'Property id: "{requested_property_id}" not in database',
             status=400,
             mimetype="application/json",
         )
