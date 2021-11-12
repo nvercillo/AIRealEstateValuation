@@ -195,10 +195,11 @@ def get_list_of_serviced_cities():
 db.init_app(app)
 
 if __name__ == "__main__":
+    port=9821
     if os.environ["PRODUCTION"] and os.environ["PRODUCTION"] == "True":
         print("\nStarted production server .... :)\n")
-        print("APP URL: https://localhost:5050\n")
+        print("APP URL: https://localhost:{}\n".format(port))
         print(f"Production DB URI: {os.environ['DB_URI']}")
-        serve(app, host="0.0.0.0", port=5050)  # run production server
+        serve(app, host="0.0.0.0", port=port)  # run production server
     else:
-        app.run(debug=True, port=5050)  # run default flask server
+        app.run(debug=True, port=port)  # run default flask server
