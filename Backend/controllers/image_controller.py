@@ -7,7 +7,7 @@ from models.image_model import Image
 from dotenv import load_dotenv
 from os.path import join, dirname
 
-load_dotenv(join(dirname(__file__), "../.env"))
+load_dotenv(join(dirname(__file__), ".env"))
 
 
 class ImageController:

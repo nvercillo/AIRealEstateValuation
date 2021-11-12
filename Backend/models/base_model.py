@@ -50,8 +50,8 @@ class BaseModel(AbstractBaseClass):
             and "_sa_instance" not in key
         }
 
-    def _select_from_where_str(self, attributes, relation, condition, distinct=None):
-        return f"SELECT {'' if not distinct else 'DISTINCT'} {attributes} FROM {relation} WHERE {condition};"
+    def _select_from_where_str(self, attributes, relation, condition, distinct=None, limit=None):
+        return f"SELECT {'' if not distinct else 'DISTINCT'} {attributes} FROM {relation} WHERE {condition} {'' if not limit else  ' LIMIT ' + str(limit) };"
 
     def _select_from_where(self, attributes, relation, condition, distinct=None):
         return self._query(

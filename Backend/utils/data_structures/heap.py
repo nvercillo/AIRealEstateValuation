@@ -31,20 +31,27 @@ class Heap:
         self.HeapNodeClass = HeapNodeClass
 
     def _find_avalible(self):
-        # iterate linearly
-        # self.queue will only psedo ordered
 
-        if self.heap_lock.acquire(blocking=True, timeout=5):  # 1 second timeout
-            for ele in self.queue:
-                if ele.node_lock.acquire(blocking=False):  # non blocking
-                    self.heap_lock.release()
-                    return ele
-            self.heap_lock.release()
+        timeout = 5
 
+        while timeout > 0 :
+            if self.heap_lock.acquire(blocking=True):
+                for ele in self.queue:
+                    if ele.node_lock.acquire(blocking=False):  # non blocking
+                        print("found available!")
+                        self.heap_lock.release()
+                        return ele
+                
+                time.sleep(0.1)
+                timeout -=0.1
+                self.heap_lock.release()
+                print("searching ")
+    
+        print("Unable to find available node during timeout period")
         return None
 
     def _update_node_val(self, node: HeapNode, new_value) -> bool:
-        if self.heap_lock.acquire(blocking=True, timeout=5):  # 1 second timeout
+        if self.heap_lock.acquire(blocking=True, timeout=10):  # 1 second timeout
 
             # ensure that sortable value const during heapify
             node.sortable_value = new_value
@@ -63,14 +70,18 @@ class Heap:
                 if self.queue[i]._is_dead():
                     to_delete.append(i)
 
+            print("to_delete", to_delete)
+
             for i in range(len(to_delete) - 1, -1, -1):
-                self.queue.pop(to_delete[i])
+                popped = self.queue.pop(to_delete[i])
 
-            for i in range(len(to_delete)):
-                self.queue.append(self.HeapNodeClass())
+            
 
-            heapq.heapify(self.queue)
+            # for i in range(len(to_delete)):
+            #     self.queue.append(self.HeapNodeClass())
+            # print(self.queue, self.queue[0].sortable_value)
 
-            self.heap_lock.release()
+            # heapq.heapify(self.queue)
+            # self.heap_lock.release()
         else:
             raise Exception("Unable to purge")

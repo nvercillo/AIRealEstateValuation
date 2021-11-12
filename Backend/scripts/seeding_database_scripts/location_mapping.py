@@ -9,7 +9,7 @@ load_dotenv(join(dirname(__file__), "../../.env"))
 sys.path.insert(0, "../../")  # import parent folder
 from statistics import stdev
 from utils.math import Math
-from models import Property
+from models.property_model import Property
 from operator import itemgetter
 from controllers.properties_controller import PropertiesController
 from matplotlib import pyplot

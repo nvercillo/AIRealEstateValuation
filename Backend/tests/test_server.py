@@ -9,17 +9,17 @@ from pprint import pprint
 load_dotenv(join(dirname(__file__), "../.env"))
 
 LOCAL_URL = "http://localhost:5050"
-PROD_URL = "https://ai-backend-flask.herokuapp.com"
+PROD_URL = "https://reavalai-backend-329119.ue.r.appspot.com/"
 
 """ REQUIREMENTS: have server running on localhost:5050 """
-
+servers_to_test = [
+    "localhost"
+    # , "production"
+]
 
 @pytest.mark.parametrize(
     "environment",
-    [
-        # "localhost", "production"
-        "localhost"
-    ],
+    servers_to_test
 )
 @pytest.mark.parametrize("authenticated", [False])
 def test_home_endpoint(environment, authenticated):
@@ -43,10 +43,7 @@ def test_home_endpoint(environment, authenticated):
 
 @pytest.mark.parametrize(
     "environment",
-    [
-        # "localhost", "production"
-        "localhost"
-    ],
+    servers_to_test
 )
 @pytest.mark.parametrize("authenticated", [True, False])
 def test_amenities(environment, authenticated):
@@ -82,10 +79,7 @@ def test_amenities(environment, authenticated):
 
 @pytest.mark.parametrize(
     "environment",
-    [
-        # "localhost", "production"
-        "localhost"
-    ],
+    servers_to_test
 )
 @pytest.mark.parametrize("authenticated", [True, False])
 def test_enumerations_endpoint(environment, authenticated):
@@ -121,10 +115,7 @@ def test_enumerations_endpoint(environment, authenticated):
 
 @pytest.mark.parametrize(
     "environment",
-    [
-        # "localhost", "production"
-        "localhost"
-    ],
+    servers_to_test
 )
 @pytest.mark.parametrize("authenticated", [True, False])
 def test_adjacent_nodes_endpoint(environment, authenticated):
@@ -179,10 +170,7 @@ def test_adjacent_nodes_endpoint(environment, authenticated):
 
 @pytest.mark.parametrize(
     "environment",
-    [
-        # "localhost", "production"
-        "localhost"
-    ],
+    servers_to_test
 )
 @pytest.mark.parametrize("authenticated", [True])
 def test_image_ids_endpoint(environment, authenticated):
@@ -214,10 +202,7 @@ def test_image_ids_endpoint(environment, authenticated):
 
 @pytest.mark.parametrize(
     "environment",
-    [
-        # "localhost", "production"
-        "localhost"
-    ],
+    servers_to_test
 )
 @pytest.mark.parametrize("authenticated", [True])
 def test_image_endpoint(environment, authenticated):

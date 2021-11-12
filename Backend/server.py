@@ -1,18 +1,19 @@
+from dotenv import load_dotenv
+from os.path import join, dirname
+load_dotenv(join(dirname(__file__), ".env"))
+
 from math import ceil
 import os
 import json
 from flask_restful import Api, Resource, reqparse
 from flask_sqlalchemy import SQLAlchemy
 from flask_cors import cross_origin
-from dotenv import load_dotenv
-from os.path import join, dirname
 from waitress import serve
 from flask import request, abort
 from utils.app_config import AppConfig
 from utils.encoders import AlchemyEncoder
 from utils.data_structures.image_cache import ImageCache
 
-load_dotenv(join(dirname(__file__), ".env"))
 
 image_cache = ImageCache(capacity=3)  # 10 images big + default
 app = AppConfig.get_app_with_db_configured()
@@ -199,6 +200,7 @@ if __name__ == "__main__":
         print("\nStarted production server .... :)\n")
         print("APP URL: https://localhost:5050\n")
         print(f"Production DB URI: {os.environ['DB_URI']}")
-        serve(app, host="0.0.0.0", port=5050)  # run production server
+        app.run(debug=True, port=5050)  # run default flask server
+        # serve(app, host="0.0.0.0", port=5050)  # run production server
     else:
         app.run(debug=True, port=5050)  # run default flask server
