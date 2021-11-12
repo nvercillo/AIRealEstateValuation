@@ -9,7 +9,7 @@ from pprint import pprint
 load_dotenv(join(dirname(__file__), "../.env"))
 
 LOCAL_URL = "http://localhost:5050"
-PROD_URL = "https://reavalai-backend-329119.ue.r.appspot.com/"
+PROD_URL = os.environ["PRODUCTION_BACKEND_URI"]
 
 """ REQUIREMENTS: have server running on localhost:5050 """
 servers_to_test = [
