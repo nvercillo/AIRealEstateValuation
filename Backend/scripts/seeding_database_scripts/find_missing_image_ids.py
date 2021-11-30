@@ -1,5 +1,5 @@
 """ 
-Description: seed database with associated images
+Description: find missing imgae ids from Data folder
 
 """
 import sys
@@ -17,7 +17,6 @@ import urllib
 from threading import Thread, Lock
 
 from utils.utility_functions import split_str_into_n_sized_parts
-from utils.utility_functions import safeprint
 
 os.chdir("../../../Data/Images")
 
@@ -56,63 +55,24 @@ class SeedDBwImages:
         thread_work_num = self.thread_work_num
         self.thread_work_num_mutex.release()
 
-        blob_arr = []
         image_arr = []
         for prop_id in (
             self.photo_paths_map[thread_work_num]
             if thread_work_num in self.photo_paths_map
             else []
         ):
-
             for prop_id in self.photo_paths_map[thread_work_num]:
 
                 for png in self.photo_paths_map[thread_work_num][prop_id]:
                     image_id = png.split(".png")[0]
-                    abs_file_name = (
-                        f"photo_info_{thread_work_num}/{prop_id}/{image_id}.png"
-                    )
 
-                    with open(abs_file_name, "rb") as f:
+                    # with open("missing_ids.txt", "a+") as myfile:
+                    #     myfile.write(image_id)
+                    res = Image(skip_creation=True)._query_by_id(image_id)
 
-                        image_binary = f.read()
-                        imageslices = split_str_into_n_sized_parts(image_binary, 64000)
+                    print("res", res)
 
-                        try:
-                            # image_arr.append(
-                            #     Image(
-                            #         id=image_id,
-                            #         property_id=prop_id,
-                            #         num_blobs=len(imageslices),
-                            #         skip_creation=False,
-                            #     )
-                            # )
-
-                            for index, slice in enumerate(imageslices):
-                                blob_arr.append(
-                                    ImageBlob(
-                                        blob_index=index,
-                                        image_id=image_id,
-                                        raw_image_binary=slice,
-                                        skip_creation=False,
-                                    )
-                                )
-
-                        except Exception as err:
-                            print(err)
-
-                    # if len(blob_arr) >= 50:
-                    #     safeprint(
-                    #         f"Inserting {len(image_arr)} images and {len(blob_arr)} blob"
-                    #     )
-
-                    #     try:
-                    #         # Image(skip_creation=True)._insert(image_arr)
-                    #         ImageBlob(skip_creation=True)._insert(blob_arr)
-                    #     except Exception as err:
-                    #         safeprint(err)
-
-                    #     image_arr.clear()
-                    #     blob_arr.clear()
+                    break
 
     def seed_db_w_images(self):
 
@@ -121,12 +81,17 @@ class SeedDBwImages:
         thread_pool = []
         for _ in self.thread_work_nums_set:
 
+            # self.insert_worker()
+
             thread = Thread(target=self.insert_worker, args=())
             thread_pool.append(thread)
             thread.start()
 
+            break
         for thread in thread_pool:
             thread.join()
+
+        # print(self.photo_paths_map[1]["008add4a-afd5-42cf-8d0e-9acb5c94b40a"])
 
 
 SeedDBwImages().seed_db_w_images()

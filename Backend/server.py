@@ -1,5 +1,6 @@
 from dotenv import load_dotenv
 from os.path import join, dirname
+
 load_dotenv(join(dirname(__file__), ".env"))
 
 from math import ceil
@@ -12,13 +13,15 @@ from waitress import serve
 from flask import request, abort
 from utils.app_config import AppConfig
 from utils.encoders import AlchemyEncoder
+from utils.utility_functions import safeprint
 from utils.data_structures.image_cache import ImageCache
+from models import db  # this line needs to be after app assignment
 
 
 image_cache = ImageCache(capacity=3)  # 10 images big + default
 app = AppConfig.get_app_with_db_configured()
+db.init_app(app)
 
-from models import db  # this line needs to be after app assignment
 
 from controllers.enumerations_controller import EnumerationsController
 from controllers.properties_controller import PropertiesController
@@ -63,10 +66,6 @@ def get_adjacent_nodes():
     data, five_nearest_ids = property_controller._get_adjacent_nodes(
         req["lng"], req["lat"]
     )
-
-    # community, district = property_controller._get_community_data_from_nearest(
-    #     five_nearest_ids
-    # )
 
     predicted_price = ai_model_controller.dummy_predict_price()
 
@@ -124,11 +123,6 @@ def get_image_ids_for_property():
 
     property_id = request.args.get("property_id")
     arr = image_controller.get_images_ids_for_property(property_id)
-
-    if len(arr) == 0:  # no images for property
-        arr = [[ImageController.INVALID_IMAGE_ID, ImageController.INVALID_IMAGE_LEN]]
-
-    arr = [[e[0], ceil(int(e[1]) / ImageController.INVALID_IMAGE_LEN)] for e in arr]
 
     response = app.response_class(
         response=json.dumps(arr, cls=AlchemyEncoder),
@@ -193,14 +187,12 @@ def get_list_of_serviced_cities():
     return response
 
 
-db.init_app(app)
-
 if __name__ == "__main__":
-    port=9821
+    port = 9821
     if os.environ["PRODUCTION"] and os.environ["PRODUCTION"] == "True":
-        print("\nStarted production server .... :)\n")
-        print("APP URL: https://localhost:{}\n".format(port))
-        print(f"Production DB URI: {os.environ['DB_URI']}")
+        safeprint("\nStarted production server .... :)\n")
+        safeprint("APP URL: https://localhost:{}\n".format(port))
+        safeprint(f"Production DB URI: {os.environ['DB_URI']}")
         # app.run(debug=True, port=5050)  # run default flask server
         serve(app, host="0.0.0.0", port=5050)  # run production server
     else:

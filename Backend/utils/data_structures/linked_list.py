@@ -1,3 +1,9 @@
+import sys
+
+sys.path.insert(0, "../../")  # import parent folder
+from utils.utility_functions import safeprint
+
+
 class LinkedList:
     class Node:
         def __init__(self, data):
@@ -72,10 +78,9 @@ class LinkedList:
             temp = temp.next
 
         return s
-    
+
     def __repr__(self):
         return self.__str__
-    
+
     def print(self):
-        print(self.__str__)
-        
+        safeprint(self.__str__)

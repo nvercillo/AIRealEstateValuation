@@ -423,14 +423,14 @@ class AIModelController:
 
         # Testing
         output = process_array(input_arr)
-        print(output)
+        safeprint(output)
 
         prediction = loaded_model.predict(output)
         y_0 = prediction[0][0]
-        print("Prediction with scaling - {}", format(y_0))
+        safeprint("Prediction with scaling - {}", format(y_0))
         y_0 -= 0.029517638588912886
         y_0 /= 1.4398848092152627e-07
         y_0 = format(int(y_0 / 1000) * 1000, ",")
 
-        print("Housing Price Prediction  - ${}".format(y_0))
+        safeprint("Housing Price Prediction  - ${}".format(y_0))
         return y_0

@@ -31,6 +31,8 @@ def objective(x, a, b, c):
     return a * x * x + b * x
 
 
+# TODO : refactor this dead code
+
 print("Getting properties")
 for p in all_props:
     nearby = prop_controller.query_by_coords_and_filter(

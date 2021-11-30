@@ -1,0 +1,1 @@
+ALTER TABLE PROPERTY_IMAGES add column blob_id varchar(36);

@@ -52,3 +52,14 @@ class AppConfig:
                 abort(401)
 
         return decorated_function
+
+    @staticmethod
+    def db_config():
+        config = {
+            'user':os.environ["DB_USER"], 
+            'password': os.environ["DB_PASSWORD"],
+            'host':os.environ["DB_HOST"],
+            'database':os.environ["DB_NAME"],
+            'use_pure': True  # uses C extension
+        }
+        return config

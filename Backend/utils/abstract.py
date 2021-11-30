@@ -38,7 +38,7 @@ class AbstractBaseClass:
 #             }
 #         )
 
-#         print(abstract_object_methods, object_methods)
+#         safeprint(abstract_object_methods, object_methods)
 #         for o_method in abstract_object_methods:
 #             if o_method not in object_methods:
 #                 raise NotImplementedError(
@@ -60,13 +60,13 @@ class AbstractBaseClass:
 #         pass
 
 #     def act(self):
-#         print("SDfsdf")
+#         safeprint("SDfsdf")
 
 #     def hehe(self):
 #         pass
 
 # def deact(self):
-#     print("SDfsdf")
+#     safeprint("SDfsdf")
 
 
 # AbstractBaseClass()

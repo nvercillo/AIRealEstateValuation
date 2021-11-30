@@ -17,10 +17,8 @@ servers_to_test = [
     # , "production"
 ]
 
-@pytest.mark.parametrize(
-    "environment",
-    servers_to_test
-)
+
+@pytest.mark.parametrize("environment", servers_to_test)
 @pytest.mark.parametrize("authenticated", [False])
 def test_home_endpoint(environment, authenticated):
 
@@ -41,10 +39,7 @@ def test_home_endpoint(environment, authenticated):
         )
 
 
-@pytest.mark.parametrize(
-    "environment",
-    servers_to_test
-)
+@pytest.mark.parametrize("environment", servers_to_test)
 @pytest.mark.parametrize("authenticated", [True, False])
 def test_amenities(environment, authenticated):
 
@@ -77,10 +72,7 @@ def test_amenities(environment, authenticated):
         )
 
 
-@pytest.mark.parametrize(
-    "environment",
-    servers_to_test
-)
+@pytest.mark.parametrize("environment", servers_to_test)
 @pytest.mark.parametrize("authenticated", [True, False])
 def test_enumerations_endpoint(environment, authenticated):
 
@@ -113,10 +105,7 @@ def test_enumerations_endpoint(environment, authenticated):
         )
 
 
-@pytest.mark.parametrize(
-    "environment",
-    servers_to_test
-)
+@pytest.mark.parametrize("environment", servers_to_test)
 @pytest.mark.parametrize("authenticated", [True, False])
 def test_adjacent_nodes_endpoint(environment, authenticated):
 
@@ -168,11 +157,8 @@ def test_adjacent_nodes_endpoint(environment, authenticated):
         )
 
 
-@pytest.mark.parametrize(
-    "environment",
-    servers_to_test
-)
-@pytest.mark.parametrize("authenticated", [True])
+@pytest.mark.parametrize("environment", servers_to_test)
+@pytest.mark.parametrize("authenticated", [True, False])
 def test_image_ids_endpoint(environment, authenticated):
 
     URL = LOCAL_URL if environment == "localhost" else PROD_URL
@@ -181,10 +167,10 @@ def test_image_ids_endpoint(environment, authenticated):
     try:
         if authenticated:
             URL += f"?key={os.environ['API_KEY']}"
-            # res = requests.get(
-            #     url=URL, params={"property_id": "0f71385b-64fe-425d-b9b8-aba3f751c7a9"}
-            # )
-            # pprint(res.text)
+            res = requests.get(
+                url=URL, params={"property_id": "0f71385b-64fe-425d-b9b8-aba3f751c7a9"}
+            )
+            pprint(res.text)
             res = requests.get(
                 url=URL, params={"property_id": "--this-property-id-doesnt-exist "}
             )
@@ -200,10 +186,7 @@ def test_image_ids_endpoint(environment, authenticated):
         )
 
 
-@pytest.mark.parametrize(
-    "environment",
-    servers_to_test
-)
+@pytest.mark.parametrize("environment", servers_to_test)
 @pytest.mark.parametrize("authenticated", [True])
 def test_image_endpoint(environment, authenticated):
 
@@ -213,14 +196,15 @@ def test_image_endpoint(environment, authenticated):
     try:
         if authenticated:
             URL += f"?key={os.environ['API_KEY']}"
-            res = requests.get(
-                url=URL,
-                params={
-                    "image_id": "---invalid---",
-                    "img_index": 0,
-                },
-            )
-            assert res.status_code == 200
+            # res = requests.get(
+            #     url=URL,
+            #     params={
+            #         "image_id": "---invalid---",
+            #         "img_index": 0,
+            #     },
+            # )
+            # assert res.status_code == 200
+            # print(res.text)
             res = requests.get(
                 url=URL,
                 params={
@@ -228,15 +212,17 @@ def test_image_endpoint(environment, authenticated):
                     "img_index": 0,
                 },
             )
+            print(res.text)
             assert res.status_code == 200
-            res = requests.get(
-                url=URL,
-                params={
-                    "image_id": "0018a5b3-232c-43e3-9b9d-7d8bba264ffc",
-                    "img_index": 0,
-                },
-            )
-            # assert res.status_code == 200
+            # res = requests.get(
+            #     url=URL,
+            #     params={
+            #         "image_id": "0018a5b3-232c-43e3-9b9d-7d8bba264ffc",
+            #         "img_index": 0,
+            #     },
+            # )
+            # # assert res.status_code == 200
+            # print(res.text)
             # res = requests.get(
             #     url=URL,
             #     params={
@@ -245,6 +231,7 @@ def test_image_endpoint(environment, authenticated):
             #     },
             # )
             # assert res.status_code == 200
+            # print(res.text)
             # res = requests.get(
             #     url=URL,
             #     params={
@@ -253,7 +240,7 @@ def test_image_endpoint(environment, authenticated):
             #     },
             # )
             # assert res.status_code == 200
-            print(res.text)
+            # print(res.text)
         else:
             res = requests.get(url=URL)
             assert res.status_code == 401

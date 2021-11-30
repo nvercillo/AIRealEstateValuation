@@ -23,15 +23,31 @@ class ImageBlob(db.Model, BaseModel):
 
     def __init__(
         self,
-        blob_index,
-        image_id,
-        raw_image_binary,
-        start_engine=False,
+        blob_index=None,
+        image_id=None,
+        raw_image_binary=None,
+        skip_creation=False,
     ):
 
-        BaseModel.initialize(self)
+        self.blob_index = blob_index
+        self.image_id = image_id
+        self.raw_image_binary = raw_image_binary
 
-        if not start_engine:
-            self.blob_index = blob_index
-            self.foreign_id = image_id
-            self.raw_image_binary = raw_image_binary
+        if not skip_creation:
+            self._create_self(self)
+
+    @staticmethod
+    def _get_columns() -> list:
+        return ["blob_index", "image_id", "raw_image_binary"]
+
+    def __as_small_dict__(self):
+        return {
+            "blob_index": str(self.blob_index),
+            "image_id": str(self.image_id),
+        }
+
+    def __repr__(self):
+        return f"< IMAGE_BLOB blob_index {self.blob_index}, image_id {self.image_id} >"
+
+    def __str__(self):
+        return f"< IMAGE_BLOB blob_index {self.blob_index}, image_id {self.image_id} >"

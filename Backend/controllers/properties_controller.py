@@ -9,6 +9,13 @@ from scipy.spatial import distance
 from scipy.stats import zscore
 from utils.math import Math
 from operator import itemgetter
+from Backend.utils.data_structures.sql_object import (
+    AttributeValue,
+    Filter,
+    Attributes,
+    Operator,
+)
+
 
 # from dotenv import load_dotenv
 # from os.path import join, dirname
@@ -23,14 +30,13 @@ class PropertiesController:
     NUM_NEARBY_CONSIDERED_FOR_AI = 50
 
     def __init__(self):
-        self.property = Property(start_engine=True)
+        self.property = Property(skip_creation=True)
 
     def _get_by_id(self, id):
-        return self.property._query_by_id(id)
+        property = self.property._query_by_id(id)
+        return property
 
-    def query_by_coords_and_filter(
-        self, lng, lat, filters=False, SEARCHING_DISTANCE=None
-    ):
+    def query_by_coords_and_filter(self, lng, lat, filters=[], SEARCHING_DISTANCE=None):
 
         if SEARCHING_DISTANCE is None:
             SEARCHING_DISTANCE = self.RADIUS_OF_VIEWABILITY
@@ -70,7 +76,9 @@ class PropertiesController:
         nearby = self.query_by_coords_and_filter(
             self.longitude,
             self.latitude,
-            filters={"style": self.style},
+            filters=Filter(
+                Attributes("style"), Operator("="), AttributeValue(self.style)
+            ),
             SEARCHING_DISTANCE=self.SEARCHABLE_DISTANCE,
         )
 
@@ -163,6 +171,8 @@ class PropertiesController:
     def _get_adjacent_nodes(self, lng, lat):
 
         res = self.query_by_coords_and_filter(lng, lat)
+
+        # TODO
 
         _map = {}
         coords = []
@@ -259,4 +269,4 @@ class PropertiesController:
 
 # res = PropertiesController()._get_by_id("eec7984d-e86e-441e-a0b7-4474cb7ff97d")
 
-# print(res)
+# safeprint(res)

@@ -1,5 +1,9 @@
 from .linked_list import LinkedList
 from abc import ABC, abstractmethod
+import sys
+
+sys.path.insert(0, "../../")  # import parent folder
+from utils.utility_functions import safeprint
 
 
 class LRUCache(ABC):  # inheriting ABC makes class abstract
@@ -11,7 +15,7 @@ class LRUCache(ABC):  # inheriting ABC makes class abstract
     def get_type(self):
         pass
 
-    def initialize(self, capacity: int):
+    def _initialize(self, capacity: int):
         self.cache = {}
         self.capacity = capacity
         self.ll = LinkedList()
@@ -54,4 +58,4 @@ class LRUCache(ABC):  # inheriting ABC makes class abstract
         return self.__str__
 
     def print(self):
-        print(self.__str__)
+        safeprint(self.__str__)
