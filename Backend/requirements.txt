@@ -13,6 +13,7 @@ py
 pytest
 python-dotenv
 python-editor
+mysql-connector-python
 requests
 scipy
 SQLAlchemy

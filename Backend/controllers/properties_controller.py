@@ -9,7 +9,7 @@ from scipy.spatial import distance
 from scipy.stats import zscore
 from utils.math import Math
 from operator import itemgetter
-from Backend.utils.data_structures.sql_object import (
+from utils.data_structures.sql_object import (
     AttributeValue,
     Filter,
     Attributes,
