@@ -13,8 +13,8 @@ PROD_URL = os.environ["PRODUCTION_BACKEND_URI"]
 
 """ REQUIREMENTS: have server running on localhost:5050 """
 servers_to_test = [
-    "localhost" # , 
-    # "production"
+    # "localhost" # , 
+    "production"
 ]
 
 

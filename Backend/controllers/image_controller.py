@@ -70,8 +70,8 @@ class ImageController:
                     join_type=JoinCondition.JoinType.LEFT,
                 ),
             )
-            byte_size = b""
+            raw_bytes = b""
             for slice in image_slices:
-                byte_size += slice.raw_image_binary
+                raw_bytes += slice.raw_image_binary
 
-            return byte_size
+            return raw_bytes

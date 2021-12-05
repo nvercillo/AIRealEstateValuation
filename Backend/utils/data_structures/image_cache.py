@@ -6,6 +6,7 @@ sys.path.insert(0, "../../")  # import parent folder
 from controllers.image_controller import ImageController
 from utils.utility_functions import split_str_into_n_sized_parts
 from constants import MAX_NUM_BYTES_PER_PKT
+import base64
 
 
 class ImageCache(LRUCache):
@@ -27,4 +28,4 @@ class ImageCache(LRUCache):
         self.put(image_id, img_slices)
 
     def get_image_slice(self, image_id, img_index):
-        return self.get(image_id)[img_index]
+        return base64.b64encode(self.get(image_id)[img_index])
