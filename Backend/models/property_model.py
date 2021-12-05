@@ -4,7 +4,7 @@ from sqlalchemy import Integer, Text
 from sqlalchemy.orm import relation, sessionmaker
 from sqlalchemy.dialects.postgresql import UUID
 
-from Backend.utils.data_structures.sql_object import (
+from utils.data_structures.sql_object import (
     AttributeValue,
     Filter,
     Attributes,
