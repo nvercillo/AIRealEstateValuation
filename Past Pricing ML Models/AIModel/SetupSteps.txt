@@ -1,0 +1,27 @@
+Setup Virtual Environments (this is for PC): 
+cd to AIModel
+
+create virtual env
+python -m venv venv
+
+start venv:
+
+cd venv/Scripts/
+
+run 
+activate
+cd .. 
+cd ..
+
+
+install packages
+
+pip install pandas
+
+pip instal -U scikit-learn
+
+pip install requests
+
+pip install js2py
+
+pip install matplotlib
