@@ -18,6 +18,8 @@ defusedxml==0.7.1
 entrypoints==0.3
 flatbuffers==1.12
 gast==0.3.3
+geographiclib==1.52
+geopy==2.2.0
 google-auth==1.32.1
 google-auth-oauthlib==0.4.4
 google-pasta==0.2.0
@@ -92,7 +94,7 @@ sklearn==0.0
 tensorboard==2.5.0
 tensorboard-data-server==0.6.1
 tensorboard-plugin-wit==1.8.0
-tensorflow
+tensorflow==2.4.4
 tensorflow-estimator==2.4.0
 termcolor==1.1.0
 terminado==0.10.1
