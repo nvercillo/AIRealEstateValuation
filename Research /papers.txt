@@ -1,1 +1,3 @@
 https://sci-hub.se/https://doi.org/10.1145/3409501.3409543
+
+https://www.researchgate.net/publication/4993356_Clustering_Using_Objective_Functions_and_Stochastic_Search
