@@ -90,3 +90,62 @@ Requirements: have gcloud installed
 gcloud init # then link to current project 
 gcloud app deploy
 ```
+
+
+
+# Setup:
+
+
+
+## Docker
+
+- Install docker
+## Database: 
+
+```
+sudo docker pull mysql/mysql-server:latest
+sudo docker run --name=mysql-docker -d mysql/mysql-server:latest
+```
+
+
+Pull out password: 
+``` sh
+sudo docker logs mysql_docker
+
+# [Entrypoint] GENERATED ROOT PASSWORD: <PASSWORD>
+```
+
+MySQL config:
+``` sh 
+sudo docker exec -it mysql-docker bash
+mysql -uroot -p
+```
+
+Change Password
+``` sql
+ALTER USER 'root'@'localhost' IDENTIFIED BY '[newpassword]';
+```
+
+
+## Update config:
+
+``` sh 
+# create dir
+sudo mkdir -p /root/docker/mysql-docker/conf.d
+
+sudo nano /root/docker/[container_name]/conf.d/my-custom.cnf 
+
+## ADD FOLLOWING LINES: 
+[mysqld]
+max_connections=250
+
+
+# Then update: 
+docker run \
+--detach \
+--name=mysql-docker \
+--env="MYSQL_ROOT_PASSWORD=32darklink" \
+--publish 6603:3306 \
+--volume=/root/docker/[container_name]/conf.d:/etc/mysql/conf.d \
+mysql
+```
